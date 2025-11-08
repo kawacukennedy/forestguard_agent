@@ -2,6 +2,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.utils import ImageReader
 import os
+import hashlib
+from datetime import datetime
 
 def run_packager_agent(incident_data, agent_transcripts, images=[]):
     os.makedirs("reports", exist_ok=True)
@@ -32,6 +34,13 @@ def run_packager_agent(incident_data, agent_transcripts, images=[]):
                 y -= 220
             except:
                 pass
+
+    # Blockchain timestamping (mock)
+    timestamp = datetime.utcnow().isoformat()
+    data_to_hash = f"{incident_data['id']}{incident_data['carbon_estimate']}{timestamp}"
+    hash_value = hashlib.sha256(data_to_hash.encode()).hexdigest()
+    c.drawString(100, y - 20, f"Blockchain Timestamp: {timestamp}")
+    c.drawString(100, y - 40, f"Hash: {hash_value}")
 
     c.save()
     return filename
