@@ -13,6 +13,7 @@ class User(Base):
     hashed_password = Column(String)
     role = Column(String)
     builder_id = Column(String, unique=True)
+    somnia_wallet_address = Column(String)
 
 class Incident(Base):
     __tablename__ = "incidents"
@@ -22,6 +23,7 @@ class Incident(Base):
     confidence_score = Column(Float)
     carbon_estimate = Column(Float)
     status = Column(String)  # e.g., 'pending', 'verified', 'false_positive'
+    somnia_tx_hash = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class Image(Base):

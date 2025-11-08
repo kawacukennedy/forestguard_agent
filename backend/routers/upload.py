@@ -16,11 +16,24 @@ s3_client = boto3.client(
     aws_secret_access_key=settings.aws_secret_access_key
 ) if settings.aws_access_key_id else None
 
+def upload_to_somnia(file_content, key):
+    # Mock Somnia decentralized storage (IPFS-like)
+    # In real, use Somnia SDK to upload to decentralized network
+    somnia_hash = f"somnia_ipfs_{key}"
+    # Fallback to local for demo
+    with open(f"uploads/{key}", "wb") as f:
+        f.write(file_content)
+    return f"somnia://{somnia_hash}"
+
 def upload_to_s3(file_content, bucket, key):
     if s3_client:
         s3_client.put_object(Bucket=bucket, Key=key, Body=file_content)
         return f"https://{bucket}.s3.amazonaws.com/{key}"
     else:
+        # Try Somnia first
+        somnia_url = upload_to_somnia(file_content, key)
+        if somnia_url:
+            return somnia_url
         # Fallback to local
         with open(f"uploads/{key}", "wb") as f:
             f.write(file_content)

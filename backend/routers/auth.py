@@ -35,9 +35,9 @@ async def login(email: str, password: str, db: Session = Depends(get_db)):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/register")
-async def register(name: str, email: str, password: str, builder_id: str, db: Session = Depends(get_db)):
+async def register(name: str, email: str, password: str, builder_id: str, somnia_wallet_address: str, db: Session = Depends(get_db)):
     hashed_password = get_password_hash(password)
-    user = User(name=name, email=email, hashed_password=hashed_password, builder_id=builder_id)
+    user = User(name=name, email=email, hashed_password=hashed_password, builder_id=builder_id, somnia_wallet_address=somnia_wallet_address)
     db.add(user)
     db.commit()
     return {"message": "User registered"}

@@ -7,6 +7,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [builderId, setBuilderId] = useState('');
+  const [somniaWallet, setSomniaWallet] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +17,7 @@ const Login = () => {
         localStorage.setItem('token', response.data.access_token);
         window.location.href = '/dashboard';
       } else {
-        await axios.post('http://localhost:8000/api/register', { name, email, password, builder_id: builderId });
+        await axios.post('http://localhost:8000/api/register', { name, email, password, builder_id: builderId, somnia_wallet_address: somniaWallet });
         alert('Registration successful, please login');
         setIsLogin(true);
       }
@@ -38,6 +39,7 @@ const Login = () => {
             <>
               <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="w-full px-3 py-2 border rounded" required />
               <input type="text" value={builderId} onChange={(e) => setBuilderId(e.target.value)} placeholder="Builder ID" className="w-full px-3 py-2 border rounded" required />
+              <input type="text" value={somniaWallet} onChange={(e) => setSomniaWallet(e.target.value)} placeholder="Somnia Wallet Address" className="w-full px-3 py-2 border rounded" required />
             </>
           )}
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full px-3 py-2 border rounded" required />

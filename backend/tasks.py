@@ -5,6 +5,7 @@ from ..agents.vision_agent import run_vision_agent
 from ..agents.verifier_agent import run_verifier_agent
 from ..agents.geolocation_agent import run_geolocation_agent
 from ..agents.packager_agent import run_packager_agent
+from ..agents.decentralization_agent import run_decentralization_agent
 from ..agents.notification_agent import run_notification_agent
 
 @celery_app.task(bind=True, max_retries=1)
@@ -50,6 +51,13 @@ def run_pipeline(self, incident_id: str):
             raise
 
         try:
+            decentralization_result = run_decentralization_agent({"id": incident_id, "carbon_estimate": geo_result["estimated_carbon_loss"]}, packager_result)
+            db.add(AgentTranscript(incident_id=incident_id, agent_name="Decentralization", transcript_text=str(decentralization_result)))
+        except Exception as e:
+            db.add(AgentTranscript(incident_id=incident_id, agent_name="Decentralization", transcript_text=f"Error: {str(e)}"))
+            raise
+
+        try:
             notify_result = run_notification_agent(incident_id, ["slack"])
             db.add(AgentTranscript(incident_id=incident_id, agent_name="Notification", transcript_text=str(notify_result)))
         except Exception as e:
@@ -60,6 +68,7 @@ def run_pipeline(self, incident_id: str):
         incident.polygon_geojson = str(vision_result["polygons"])
         incident.confidence_score = vision_result["confidence_score"]
         incident.carbon_estimate = geo_result["estimated_carbon_loss"]
+        incident.somnia_tx_hash = decentralization_result["somnia_tx_hash"]
         incident.status = "processed"
         db.commit()
     except Exception as e:
