@@ -1,9 +1,15 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float, Text, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, DateTime, Float, Text, ForeignKey, JSON, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
+import enum
 
 Base = declarative_base()
+
+class UserRole(enum.Enum):
+    admin = "admin"
+    ranger = "ranger"
+    ngo = "ngo"
 
 class User(Base):
     __tablename__ = "users"
@@ -11,7 +17,7 @@ class User(Base):
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    role = Column(String)
+    role = Column(Enum(UserRole), default=UserRole.ranger)
     builder_id = Column(String, unique=True)
     somnia_wallet_address = Column(String)
 
@@ -24,6 +30,7 @@ class Incident(Base):
     carbon_estimate = Column(Float)
     status = Column(String)  # e.g., 'pending', 'verified', 'false_positive'
     somnia_tx_hash = Column(String)
+    assigned_to = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class Image(Base):
@@ -40,4 +47,12 @@ class AgentTranscript(Base):
     incident_id = Column(Integer, ForeignKey("incidents.id"))
     agent_name = Column(String)
     transcript_text = Column(Text)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+class Comment(Base):
+    __tablename__ = "comments"
+    id = Column(Integer, primary_key=True, index=True)
+    incident_id = Column(Integer, ForeignKey("incidents.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    comment_text = Column(Text)
     timestamp = Column(DateTime, default=datetime.utcnow)

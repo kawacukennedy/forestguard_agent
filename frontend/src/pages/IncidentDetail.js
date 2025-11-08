@@ -7,6 +7,7 @@ const IncidentDetail = () => {
   const { id } = useParams();
   const [incident, setIncident] = useState(null);
   const [allIncidents, setAllIncidents] = useState([]);
+  const [users, setUsers] = useState([]);
   const mapContainer = useRef(null);
   const map = useRef(null);
 
@@ -19,6 +20,8 @@ const IncidentDetail = () => {
       ]);
       setIncident(incidentRes.data);
       setAllIncidents(allRes.data);
+      // Mock users, in real app fetch from API
+      setUsers([{ id: 1, name: 'Ranger User' }, { id: 2, name: 'NGO User' }]);
     };
     fetchData();
   }, [id]);
@@ -73,6 +76,23 @@ const IncidentDetail = () => {
   const prevId = currentIndex > 0 ? allIncidents[currentIndex - 1].id : null;
   const nextId = currentIndex < allIncidents.length - 1 ? allIncidents[currentIndex + 1].id : null;
 
+  const assignIncident = async (userId) => {
+    const token = localStorage.getItem('token');
+    await axios.put(`http://localhost:8000/api/incidents/${id}/assign`, { user_id: parseInt(userId) }, { headers: { Authorization: `Bearer ${token}` } });
+    // Refresh
+    window.location.reload();
+  };
+
+  const addComment = async () => {
+    const commentText = document.getElementById('commentText').value;
+    if (!commentText) return;
+    const token = localStorage.getItem('token');
+    await axios.post(`http://localhost:8000/api/incidents/${id}/comments`, { comment_text: commentText, user_id: 1 }, { headers: { Authorization: `Bearer ${token}` } });
+    document.getElementById('commentText').value = '';
+    // Refresh
+    window.location.reload();
+  };
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-4">
@@ -84,6 +104,11 @@ const IncidentDetail = () => {
       <p>Carbon Estimate: {incident.incident.carbon_estimate} kg CO2</p>
       <p>Confidence: {incident.incident.confidence_score}</p>
       {incident.incident.somnia_tx_hash && <p>Somnia TX Hash: {incident.incident.somnia_tx_hash}</p>}
+      <p>Assigned to: {users.find(u => u.id === incident.incident.assigned_to)?.name || 'Unassigned'}</p>
+      <select onChange={(e) => assignIncident(e.target.value)}>
+        <option value="">Assign to...</option>
+        {users.map(user => <option key={user.id} value={user.id}>{user.name}</option>)}
+      </select>
       <div className="mb-4" ref={mapContainer} style={{ height: '400px' }} />
       <div>
         <h3>Images</h3>
@@ -94,6 +119,14 @@ const IncidentDetail = () => {
         <div className="max-h-60 overflow-y-scroll">
           {incident.transcripts.map(trans => <p key={trans.id}><strong>{trans.agent_name}:</strong> {trans.transcript_text}</p>)}
         </div>
+      </div>
+      <div>
+        <h3>Comments</h3>
+        <div className="max-h-60 overflow-y-scroll">
+          {incident.comments.map(comment => <p key={comment.id}><strong>{users.find(u => u.id === comment.user_id)?.name}:</strong> {comment.comment_text}</p>)}
+        </div>
+        <textarea id="commentText" placeholder="Add a comment..." className="w-full px-3 py-2 border rounded mt-2"></textarea>
+        <button onClick={addComment} className="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Add Comment</button>
       </div>
       <button onClick={() => window.open(`http://localhost:8000/api/incidents/${id}/download`)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Download Report</button>
     </div>

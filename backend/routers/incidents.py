@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from ..database import get_db
-from ..models import Incident, Image, AgentTranscript
+from ..models import Incident, Image, AgentTranscript, Comment
 from typing import List
 import os
 from sqlalchemy import func
@@ -40,10 +40,12 @@ async def get_incident(incident_id: str, db: Session = Depends(get_db)):
         return {"error": "Incident not found"}
     images = db.query(Image).filter(Image.incident_id == incident_id).all()
     transcripts = db.query(AgentTranscript).filter(AgentTranscript.incident_id == incident_id).all()
+    comments = db.query(Comment).filter(Comment.incident_id == incident_id).all()
     return {
         "incident": incident,
         "images": images,
-        "transcripts": transcripts
+        "transcripts": transcripts,
+        "comments": comments
     }
 
 @router.get("/incidents/{incident_id}/download")
@@ -52,6 +54,22 @@ async def download_report(incident_id: str):
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Report not found")
     return FileResponse(file_path, media_type='application/pdf', filename=f"incident_{incident_id}.pdf")
+
+@router.post("/incidents/{incident_id}/comments")
+async def add_comment(incident_id: str, comment_text: str, user_id: int, db: Session = Depends(get_db)):
+    comment = Comment(incident_id=incident_id, user_id=user_id, comment_text=comment_text)
+    db.add(comment)
+    db.commit()
+    return {"message": "Comment added"}
+
+@router.put("/incidents/{incident_id}/assign")
+async def assign_incident(incident_id: str, user_id: int, db: Session = Depends(get_db)):
+    incident = db.query(Incident).filter(Incident.id == incident_id).first()
+    if incident:
+        incident.assigned_to = user_id
+        db.commit()
+        return {"message": "Incident assigned"}
+    return {"error": "Incident not found"}
 
 @router.get("/stats")
 async def get_stats(db: Session = Depends(get_db)):
