@@ -11,6 +11,17 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchIncidents();
+
+    // WebSocket connection
+    const ws = new WebSocket('ws://localhost:8000/ws');
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'incident_update') {
+        fetchIncidents(); // Refresh incidents
+      }
+    };
+
+    return () => ws.close();
   }, [filters]);
 
   const fetchIncidents = async () => {

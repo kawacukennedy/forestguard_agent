@@ -12,6 +12,7 @@ const Upload = () => {
   const [cameraOpen, setCameraOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [toast, setToast] = useState(null);
+  const [ws, setWs] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -30,23 +31,37 @@ const Upload = () => {
     const token = localStorage.getItem('token');
     try {
       setStatus('Uploading...');
-      await axios.post('http://localhost:8000/api/upload', formData, {
+      const response = await axios.post('http://localhost:8000/api/upload', formData, {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
           setProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
         }
       });
+      const incidentId = response.data.incident_id;
+
       setStatus('Processing pipeline...');
-      // Simulate pipeline progress
-      setTimeout(() => setProgress(25), 1000);
-      setTimeout(() => setProgress(50), 2000);
-      setTimeout(() => setProgress(75), 3000);
-      setTimeout(() => {
-        setProgress(100);
-        setStatus('Complete');
-        setToast({ message: 'Upload and processing successful', type: 'success' });
-        setTimeout(() => window.location.href = '/dashboard', 1000);
-      }, 4000);
+
+      // Connect to WebSocket for progress
+      const websocket = new WebSocket('ws://localhost:8000/ws');
+      websocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'progress' && data.incident_id === incidentId) {
+          if (data.step === 'Vision') setProgress(25);
+          else if (data.step === 'Verifier') setProgress(40);
+          else if (data.step === 'Geolocation') setProgress(60);
+          else if (data.step === 'Packager') setProgress(80);
+          else if (data.step === 'Decentralization') setProgress(90);
+          setStatus(`${data.step} completed`);
+        } else if (data.type === 'incident_update' && data.incident_id === incidentId) {
+          setProgress(100);
+          setStatus('Complete');
+          setToast({ message: 'Upload and processing successful', type: 'success' });
+          websocket.close();
+          setTimeout(() => window.location.href = '/dashboard', 1000);
+        }
+      };
+
+      setWs(websocket);
     } catch (error) {
       setStatus('Failed');
       setToast({ message: 'Upload failed', type: 'error' });
