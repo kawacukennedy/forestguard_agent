@@ -82,8 +82,8 @@ const Dashboard = () => {
   }, [incidents]);
 
   return (
-    <div className="h-screen flex">
-      <div className="w-1/4 bg-gray-200 p-4 overflow-y-auto">
+    <div className="h-screen flex bg-white dark:bg-gray-900 text-black dark:text-white">
+      <div className="w-1/4 bg-gray-200 dark:bg-gray-800 p-4 overflow-y-auto">
         <h3 className="text-lg font-bold mb-4">Filters</h3>
         <div className="mb-4">
           <label>Search (ID or Location):</label>

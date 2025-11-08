@@ -5,6 +5,7 @@ from ..database import get_db
 from ..models import Incident, Image, AgentTranscript
 from typing import List
 import os
+from sqlalchemy import func
 
 router = APIRouter()
 
@@ -51,3 +52,17 @@ async def download_report(incident_id: str):
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="Report not found")
     return FileResponse(file_path, media_type='application/pdf', filename=f"incident_{incident_id}.pdf")
+
+@router.get("/stats")
+async def get_stats(db: Session = Depends(get_db)):
+    total_incidents = db.query(func.count(Incident.id)).scalar()
+    total_carbon = db.query(func.sum(Incident.carbon_estimate)).scalar() or 0
+    incidents_by_status = db.query(Incident.status, func.count(Incident.id)).group_by(Incident.status).all()
+    incidents_over_time = db.query(func.date(Incident.timestamp), func.count(Incident.id)).group_by(func.date(Incident.timestamp)).all()
+
+    return {
+        "total_incidents": total_incidents,
+        "total_carbon_impact": total_carbon,
+        "incidents_by_status": dict(incidents_by_status),
+        "incidents_over_time": [{"date": str(date), "count": count} for date, count in incidents_over_time]
+    }

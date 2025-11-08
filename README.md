@@ -112,11 +112,15 @@ Simple U-Net for semantic segmentation. Train on deforestation datasets for bett
 
 ## API Endpoints
 
-- `POST /api/upload`: Upload images
-- `GET /api/incidents`: List incidents with filters
-- `GET /api/incidents/{id}`: Incident details
-- `POST /api/agents/run`: Manual pipeline trigger
-- `POST /api/notify`: Send notifications
+The API is documented with Swagger UI at `http://localhost:8000/docs` when running the backend.
+
+- `POST /api/upload`: Accepts image(s) and metadata, triggers Somnia agentic pipeline, returns incident ID, pipeline status, and Somnia transaction hash
+- `GET /api/incidents`: Returns list of incidents with filters for date, confidence, region, status, and Somnia verification
+- `GET /api/incidents/{id}`: Returns detailed incident data including images, polygon, carbon impact, agent transcript, and Somnia hash
+- `GET /api/incidents/stats`: Returns statistics on incidents, carbon impact, and trends
+- `POST /api/agents/run`: Trigger Somnia agentic workflow for given images or batch; logs each agent's reasoning and outputs decentralized proofs
+- `POST /api/notify`: Sends notifications to Slack, Telegram, or Email for newly processed incidents
+- `POST /api/infer`: Direct ML inference on uploaded images
 
 ## Contributing
 
