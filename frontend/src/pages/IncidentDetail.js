@@ -148,7 +148,8 @@ const IncidentDetail = () => {
         <button onClick={addComment} className="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Add Comment</button>
       </div>
       <button onClick={() => window.open(`http://localhost:8000/api/incidents/${id}/download`)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Download Report</button>
-      {incident.incident.nft_id && (
+      <button onClick={() => navigator.share({ title: `Incident ${id}`, text: 'Check out this deforestation incident', url: window.location.href })} className="mt-4 ml-4 bg-purple-600 text-white px-4 py-2 rounded">Share</button>
+      {incident.incident.nft_ids && (
         <button onClick={() => alert('Reward claimed! (Mock action)')} className="mt-4 ml-4 bg-green-600 text-white px-4 py-2 rounded">Claim Reward</button>
       )}
     </div>

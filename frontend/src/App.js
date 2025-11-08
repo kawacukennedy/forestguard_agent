@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import IncidentDetail from './pages/IncidentDetail';
 import Upload from './pages/Upload';
 import Stats from './pages/Stats';
+import Settings from './pages/Settings';
 
 function App() {
   const isLoggedIn = localStorage.getItem('token');
@@ -20,6 +21,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/stats" element={<Stats />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/incident/:id" element={<IncidentDetail />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/" element={<Login />} />

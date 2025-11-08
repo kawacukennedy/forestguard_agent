@@ -21,6 +21,7 @@ class User(Base):
     builder_id = Column(String, unique=True)
     wallet_addresses = Column(JSON)  # Dict of chain: address
     reward_points = Column(Float, default=0.0)
+    referral_code = Column(String, unique=True)
 
 class Incident(Base):
     __tablename__ = "incidents"

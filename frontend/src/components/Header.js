@@ -35,6 +35,7 @@ const Header = () => {
           Somnia: {somniaConnected ? 'Connected' : 'Disconnected'}
         </span>
         <button onClick={() => window.location.href = '/stats'} className="mr-4">Stats</button>
+        <button onClick={() => window.location.href = '/settings'} className="mr-4">Settings</button>
         <button className="mr-4">Notifications</button>
         <button onClick={() => { localStorage.removeItem('token'); window.location.href = '/login'; }}>Logout</button>
       </div>
