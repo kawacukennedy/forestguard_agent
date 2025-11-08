@@ -29,7 +29,9 @@ async def run_agent_pipeline(incident_id: str, db: Session = Depends(get_db)):
     geo_result = run_geolocation_agent(vision_result["polygons"], {})
     db.add(AgentTranscript(incident_id=incident_id, agent_name="Geolocation", transcript_text=str(geo_result)))
 
-    packager_result = run_packager_agent({"id": incident_id, "carbon_estimate": geo_result["estimated_carbon_loss"]}, [])
+    transcripts = db.query(AgentTranscript).filter(AgentTranscript.incident_id == incident_id).all()
+    transcript_data = [{"agent_name": t.agent_name, "transcript_text": t.transcript_text} for t in transcripts]
+    packager_result = run_packager_agent({"id": incident_id, "carbon_estimate": geo_result["estimated_carbon_loss"], "status": incident.status}, transcript_data, images)
     db.add(AgentTranscript(incident_id=incident_id, agent_name="Packager", transcript_text=str(packager_result)))
 
     notify_result = run_notification_agent(incident_id, ["slack"])

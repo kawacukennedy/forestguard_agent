@@ -1,5 +1,5 @@
-from .database import engine, Base
-from .models import User, Incident, Image, AgentTranscript
+from database import engine, Base
+from models import User, Incident, Image, AgentTranscript
 
 def init_database():
     Base.metadata.create_all(bind=engine)
