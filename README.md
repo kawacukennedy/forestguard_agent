@@ -1,6 +1,23 @@
 # ForestGuard Agent Universal
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![ZetaChain](https://img.shields.io/badge/ZetaChain-Omnichain-blue)](https://zetachain.com)
+
 An omnichain AI + Web3 system that detects, verifies, and tokenizes deforestation incidents across Solana, Sui, TON, and other chains via ZetaChain. It integrates AI agents (Vision, Verifier, Geolocation, Packager), mints NFT/reward proofs, and synchronizes them cross-chain. Each incident report is verified, tokenized, and accessible on multiple chains. The app demonstrates true universal connectivity with onCall, onRevert, and onAbort functions enabling seamless cross-chain interactions.
+
+## Table of Contents
+
+- [Features](#features)
+- [Architecture](#architecture)
+- [Setup & Run](#setup--run)
+- [API Documentation](#api-documentation)
+- [ZetaChain Integration](#zetachain-integration)
+- [ML Model](#ml-model)
+- [Deployment](#deployment)
+- [Demo Requirements](#demo-requirements)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
@@ -15,6 +32,16 @@ An omnichain AI + Web3 system that detects, verifies, and tokenizes deforestatio
 - **Storage**: IPFS/Somnia decentralized storage with S3/local fallback.
 - **Async Processing**: Celery for background tasks.
 - **Universal Verification**: Cross-chain timestamping and NFT proofs for tamper-proof records.
+- **User Enhancements**: Settings page, dark mode, social sharing, referral system.
+
+## Screenshots
+
+*(Screenshots would be added here in a real repo)*
+
+- **Dashboard**: Interactive map showing deforestation incidents with filters.
+- **Incident Detail**: Detailed view with images, carbon estimates, and NFT proofs.
+- **Upload Page**: Form for submitting images with progress tracking.
+- **Settings**: User preferences including theme and referral code.
 
 ## Architecture
 
@@ -33,25 +60,35 @@ An omnichain AI + Web3 system that detects, verifies, and tokenizes deforestatio
 
 ### Local Development
 
-1. Clone repo: `git clone <repo> && cd forestguard`
+1. **Clone Repository**:
+   ```bash
+   git clone https://github.com/kawacukennedy/forestguard_agent.git
+   cd forestguard_agent
+   ```
 
-2. Backend setup:
+2. **Backend Setup**:
    ```bash
    cd backend
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -r requirements.txt
    python init_db.py
    ```
 
-3. Frontend setup:
+3. **Frontend Setup**:
    ```bash
    cd frontend
    npm install
    ```
 
-4. Run services:
-   - Backend: `uvicorn main:app --reload`
+4. **Environment Variables**:
+   Create `.env` files as described in [Environment Variables](#environment-variables) section.
+
+5. **Run Services**:
+   - Backend: `uvicorn main:app --reload --host 0.0.0.0 --port 8000`
    - Frontend: `npm start`
-   - Redis: `redis-server` (for Celery)
+   - Redis: `redis-server` (for Celery, if not using Docker)
+   - Celery: `celery -A backend.celery_app worker --loglevel=info`
 
 ### Docker Deployment
 
@@ -149,9 +186,105 @@ The API is documented with Swagger UI at `http://localhost:8000/docs` when runni
 - `POST /api/notify`: Send alerts to Slack, Telegram, Email, or Web3 dashboards
 - `POST /api/infer`: Direct ML inference on uploaded images
 
+### Detailed API Documentation
+
+#### Authentication
+All endpoints except `/api/auth/login` and `/api/auth/register` require JWT token in header: `Authorization: Bearer <token>`
+
+#### Upload Endpoint
+```
+POST /api/upload
+Content-Type: multipart/form-data
+
+Parameters:
+- files: Image files (multiple allowed)
+- location: String (optional)
+- description: String (optional)
+
+Response:
+{
+  "incident_id": "string",
+  "message": "Upload successful",
+  "reward_points": 10.5
+}
+```
+
+#### Incidents Endpoints
+```
+GET /api/incidents?date_from=2023-01-01&confidence_min=0.8&chain=solana
+
+Response:
+[
+  {
+    "id": "string",
+    "timestamp": "datetime",
+    "polygon_geojson": "string",
+    "confidence_score": 0.95,
+    "carbon_estimate": 100.0,
+    "status": "processed",
+    "zeta_tx_hashes": {"solana": "hash1", "sui": "hash2"},
+    "nft_ids": {"solana": "nft1", "sui": "nft2"}
+  }
+]
+```
+
+#### Leaderboard
+```
+GET /api/incidents/leaderboard?limit=10
+
+Response:
+[
+  {
+    "name": "User1",
+    "reward_points": 150.0,
+    "role": "ranger"
+  }
+]
+```
+
+## Troubleshooting
+
+### Common Issues
+
+- **Database Connection Error**: Ensure PostgreSQL is running or use SQLite for demo.
+- **ZetaChain Testnet Issues**: Check RPC endpoints and private key in `.env`.
+- **Wallet Connection Failed**: Verify wallet extensions are installed and networks are configured.
+- **ML Inference Errors**: Ensure PyTorch is installed and model files are present.
+- **WebSocket Not Connecting**: Check backend is running on port 8000.
+
+### Logs
+Check backend logs with `docker-compose logs backend` or `uvicorn main:app --log-level info`.
+
 ## Contributing
 
-Use Amazon Q Developer for code assistance, Kiro for testing specs.
+We welcome contributions! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit changes: `git commit -m 'Add some feature'`
+4. Push to branch: `git push origin feature/your-feature`
+5. Open a Pull Request
+
+### Development Tools
+- **Amazon Q Developer**: For code generation and assistance
+- **Kiro IDE**: For spec-driven development and testing
+- **ZetaChain SDK**: For omnichain integrations
+
+### Code Style
+- Follow PEP8 for Python
+- Use ESLint for JavaScript/React
+- Add comments for complex logic
+
+## Bounty Alignment
+
+This project aligns with the **Universal App / Omnichain Connectivity** bounty category:
+
+- **Utility**: Real-world environmental monitoring with cross-chain NFT/reward minting and multi-chain verifiable data.
+- **Growth**: Leaderboard gamification, social sharing, referral system, and wallet-based reward claiming.
+- **Users Goal**: Designed for 40+ real users with viral hooks.
+- **Hype**: Cross-chain NFTs, live AI agentic pipeline, Web3 integrations, and omnichain demos.
+
+Built with ZetaChain testnet, supporting Solana, Sui, TON chains.
 
 ## License
 
