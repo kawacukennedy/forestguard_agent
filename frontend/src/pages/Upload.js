@@ -55,7 +55,7 @@ const Upload = () => {
         } else if (data.type === 'incident_update' && data.incident_id === incidentId) {
           setProgress(100);
           setStatus('Complete');
-          setToast({ message: 'Upload and processing successful', type: 'success' });
+          setToast({ message: `Upload and processing successful! Earned ${data.reward_points} reward points.`, type: 'success' });
           websocket.close();
           setTimeout(() => window.location.href = '/dashboard', 1000);
         }

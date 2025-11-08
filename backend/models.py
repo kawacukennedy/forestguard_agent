@@ -20,6 +20,7 @@ class User(Base):
     role = Column(Enum(UserRole), default=UserRole.ranger)
     builder_id = Column(String, unique=True)
     somnia_wallet_address = Column(String)
+    reward_points = Column(Float, default=0.0)
 
 class Incident(Base):
     __tablename__ = "incidents"
@@ -30,6 +31,7 @@ class Incident(Base):
     carbon_estimate = Column(Float)
     status = Column(String)  # e.g., 'pending', 'verified', 'false_positive'
     somnia_tx_hash = Column(String)
+    nft_id = Column(String, nullable=True)
     assigned_to = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
 

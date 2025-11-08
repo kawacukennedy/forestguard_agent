@@ -1,6 +1,6 @@
 from .celery_app import celery_app
 from .database import SessionLocal
-from .models import Incident, AgentTranscript, Image
+from .models import Incident, AgentTranscript, Image, User
 from ..agents.vision_agent import run_vision_agent
 from ..agents.verifier_agent import run_verifier_agent
 from ..agents.geolocation_agent import run_geolocation_agent
@@ -75,7 +75,15 @@ def run_pipeline(self, incident_id: str):
         incident.confidence_score = vision_result["confidence_score"]
         incident.carbon_estimate = geo_result["estimated_carbon_loss"]
         incident.somnia_tx_hash = decentralization_result["somnia_tx_hash"]
+        incident.nft_id = decentralization_result["nft_id"]
         incident.status = "processed"
+
+        # Assign reward points to the user
+        if incident.assigned_to:
+            user = db.query(User).filter(User.id == incident.assigned_to).first()
+            if user:
+                user.reward_points += decentralization_result["reward_points"]
+
         db.commit()
 
         # Broadcast update
@@ -84,7 +92,9 @@ def run_pipeline(self, incident_id: str):
             "type": "incident_update",
             "incident_id": incident_id,
             "status": "processed",
-            "somnia_tx_hash": decentralization_result["somnia_tx_hash"]
+            "somnia_tx_hash": decentralization_result["somnia_tx_hash"],
+            "nft_id": decentralization_result["nft_id"],
+            "reward_points": decentralization_result["reward_points"]
         }))
     except Exception as e:
         db.rollback()

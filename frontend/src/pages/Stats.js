@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const Stats = () => {
   const [stats, setStats] = useState(null);
+  const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -12,7 +13,15 @@ const Stats = () => {
       });
       setStats(response.data);
     };
+    const fetchLeaderboard = async () => {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:8000/api/incidents/leaderboard', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setLeaderboard(response.data);
+    };
     fetchStats();
+    fetchLeaderboard();
   }, []);
 
   if (!stats) return <div>Loading...</div>;
@@ -42,6 +51,19 @@ const Stats = () => {
           <ul className="max-h-32 overflow-y-scroll">
             {stats.incidents_over_time.map((item, index) => (
               <li key={index}>{item.date}: {item.count}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Leaderboard</h2>
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded">
+          <ul>
+            {leaderboard.map((user, index) => (
+              <li key={index} className="flex justify-between py-2">
+                <span>{index + 1}. {user.name} ({user.role})</span>
+                <span>{user.reward_points} points</span>
+              </li>
             ))}
           </ul>
         </div>

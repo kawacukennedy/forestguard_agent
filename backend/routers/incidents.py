@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from ..database import get_db
-from ..models import Incident, Image, AgentTranscript, Comment
+from ..models import Incident, Image, AgentTranscript, Comment, User
 from typing import List
 import os
 from sqlalchemy import func
@@ -84,3 +84,8 @@ async def get_stats(db: Session = Depends(get_db)):
         "incidents_by_status": dict(incidents_by_status),
         "incidents_over_time": [{"date": str(date), "count": count} for date, count in incidents_over_time]
     }
+
+@router.get("/leaderboard")
+async def get_leaderboard(db: Session = Depends(get_db), limit: int = Query(10)):
+    users = db.query(User).order_by(User.reward_points.desc()).limit(limit).all()
+    return [{"name": user.name, "reward_points": user.reward_points, "role": user.role.value} for user in users]

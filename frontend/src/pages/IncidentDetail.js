@@ -104,6 +104,7 @@ const IncidentDetail = () => {
       <p>Carbon Estimate: {incident.incident.carbon_estimate} kg CO2</p>
       <p>Confidence: {incident.incident.confidence_score}</p>
       {incident.incident.somnia_tx_hash && <p>Somnia TX Hash: {incident.incident.somnia_tx_hash}</p>}
+      {incident.incident.nft_id && <p>NFT ID: {incident.incident.nft_id}</p>}
       <p>Assigned to: {users.find(u => u.id === incident.incident.assigned_to)?.name || 'Unassigned'}</p>
       <select onChange={(e) => assignIncident(e.target.value)}>
         <option value="">Assign to...</option>
@@ -129,6 +130,9 @@ const IncidentDetail = () => {
         <button onClick={addComment} className="mt-2 bg-blue-600 text-white px-4 py-2 rounded">Add Comment</button>
       </div>
       <button onClick={() => window.open(`http://localhost:8000/api/incidents/${id}/download`)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Download Report</button>
+      {incident.incident.nft_id && (
+        <button onClick={() => alert('Reward claimed! (Mock action)')} className="mt-4 ml-4 bg-green-600 text-white px-4 py-2 rounded">Claim Reward</button>
+      )}
     </div>
   );
 };

@@ -89,11 +89,12 @@ REACT_APP_SOMNIA_WALLET_SDK_URL=https://somnia-wallet-sdk.example.com
 
 ## Usage
 
-1. Register/Login with Builder ID.
-2. Upload images on /upload.
-3. View processing progress.
-4. See incidents on /dashboard map.
-5. Click incident for details, download PDF.
+1. Register/Login with Builder ID and connect wallet.
+2. Upload images on /upload; earn reward points upon completion.
+3. View processing progress and NFT minting.
+4. See incidents on /dashboard map with NFT proofs.
+5. Click incident for details, download PDF, claim rewards.
+6. Check leaderboard on /stats for top contributors.
 
 ## Agent Orchestration
 
@@ -105,6 +106,26 @@ Built with Amazon Q Developer for code generation, Kiro for spec-driven developm
 - **Decentralized Storage**: Images and reports are stored on Somnia network for tamper-proof access.
 - **Transaction Verification**: Each incident includes a Somnia transaction hash for blockchain verification.
 - **Network Status**: Real-time indicator shows Somnia node connection.
+
+### Web3 Features
+
+- **NFT Minting**: Each verified incident mints an NFT as proof of environmental impact.
+- **Tokenized Rewards**: Users earn reward points based on carbon impact; claimable via wallet.
+- **Leaderboard**: Top contributors ranked by reward points.
+- **Wallet Integration**: Connect MetaMask or Somnia wallet for NFT ownership and reward claiming.
+
+#### Wallet Setup
+
+1. Install MetaMask or Somnia Wallet extension.
+2. Create/connect a wallet.
+3. In the app, go to Login and connect your wallet.
+4. Use the wallet to claim rewards and view NFTs.
+
+#### NFT Minting
+
+- NFTs are minted automatically after pipeline completion.
+- View NFT ID in incident details.
+- Transfer or trade NFTs on supported marketplaces.
 
 ## ML Model
 
@@ -118,6 +139,7 @@ The API is documented with Swagger UI at `http://localhost:8000/docs` when runni
 - `GET /api/incidents`: Returns list of incidents with filters for date, confidence, region, status, and Somnia verification
 - `GET /api/incidents/{id}`: Returns detailed incident data including images, polygon, carbon impact, agent transcript, and Somnia hash
 - `GET /api/incidents/stats`: Returns statistics on incidents, carbon impact, and trends
+- `GET /api/incidents/leaderboard`: Returns top users by reward points
 - `POST /api/agents/run`: Trigger Somnia agentic workflow for given images or batch; logs each agent's reasoning and outputs decentralized proofs
 - `POST /api/notify`: Sends notifications to Slack, Telegram, or Email for newly processed incidents
 - `POST /api/infer`: Direct ML inference on uploaded images

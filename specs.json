@@ -1,43 +1,48 @@
 {
   "project": "ForestGuard Agent",
-  "description": "ForestGuard Agent is an autonomous, multi-agent AI system for real-time detection, verification, and reporting of deforestation events. The system ingests satellite, drone, and community-submitted images, detects tree loss, verifies flagged events through multi-agent reasoning, estimates carbon impact, and auto-generates incident packages for NGOs, park rangers, and authorities. The app includes a web dashboard, real-time notifications, and a complete agent orchestration using Amazon Q Developer and Kiro.",
-  "goal": "Generate a fully functional, production-ready ForestGuard Agent app with complete frontend, backend, agent workflows, ML inference, notifications, reporting, UX/UI flows, and deployment instructions.",
+  "description": "ForestGuard Agent is a Web3-enabled autonomous multi-agent AI system for real-time detection, verification, and reporting of deforestation. It ingests satellite, drone, and community-submitted images, detects tree loss, verifies flagged events, estimates carbon impact, and generates tamper-proof incident packages. Reports are tokenized on the Somnia network (NFTs), enabling verifiable environmental impact tracking. The app combines AI + Web3 to incentivize real users, create hype, and support eco-credits or tokenized rewards.",
+  "goal": "Build a fully functional, semi-vibe-coded or vibe-coded ForestGuard Agent app with frontend, backend, agent workflows, ML inference, notifications, reporting, decentralized storage, Web3 token/NFT integration, and adoption-ready UX flows for 40+ real users. The app should have viral/utility hooks, be hackathon-ready, and comply with Web3 bounty preferences.",
   "app_architecture": {
     "frontend": {
-      "framework": "React.js + Tailwind CSS",
+      "framework": "React.js + Tailwind CSS + Web3 wallet SDK (MetaMask/Somnia Wallet)",
       "pages": [
         {
           "name": "Login / Registration",
           "micro_UI": [
             "Email input",
             "Password input",
-            "Builder ID login button (integrates with Amazon Q Developer/Kiro)",
+            "Wallet connect (Somnia/MetaMask) for identity & Web3 token/NFT access",
+            "Builder ID login button (Amazon Q Developer/Kiro integration)",
             "Sign up link",
             "Forgot password link",
-            "Validation messages for email/password"
+            "Validation messages for email/password/wallet"
           ],
           "UX_flow": [
             "User lands on login page",
-            "Validates Builder ID credentials",
+            "Validates Builder ID and wallet",
+            "Wallet unlock triggers access to tokenized reports/NFTs",
             "Redirects to Dashboard on successful login",
-            "Error message display for failed login"
+            "Error messages shown for failed login or wallet connect"
           ]
         },
         {
           "name": "Dashboard / Map View",
           "micro_UI": [
-            "Full-screen map (Mapbox GL) showing all incidents as polygons",
-            "Incident pins with hover tooltip (summary + confidence score)",
-            "Sidebar with filter options: Date, Confidence Score, Region, Status",
+            "Full-screen Mapbox map showing all incidents as polygons",
+            "Incident pins with hover tooltip (summary + confidence score + NFT proof)",
+            "Sidebar with filters: Date, Confidence, Region, Status, Token Reward Available",
             "Search bar for incident ID or location",
             "Add new image button (file uploader)",
-            "Refresh button for latest incidents"
+            "Refresh button for latest incidents",
+            "Leaderboard / user contribution stats",
+            "Network & wallet connection status"
           ],
           "UX_flow": [
-            "User sees map with all incidents",
-            "User can filter incidents to reduce clutter",
-            "Clicking an incident polygon opens Incident Detail page",
-            "Hovering incident pin shows quick info tooltip"
+            "User sees all incidents with NFT tokenized verification",
+            "Filters reduce map clutter",
+            "Clicking polygon opens Incident Detail page",
+            "Hovering pin shows quick info + reward availability",
+            "Wallet connection allows claiming rewards for submissions"
           ]
         },
         {
@@ -45,205 +50,138 @@
           "micro_UI": [
             "Incident ID, timestamp, status badge",
             "Polygon map zoomed to incident",
-            "List of uploaded images (thumbnails + full preview on click)",
-            "Carbon impact estimate with formula breakdown",
+            "List of uploaded images (thumbnails + full preview)",
+            "Carbon impact estimate with breakdown",
             "Agent transcript panel (collapsible, scrollable)",
-            "Download incident report button (PDF)",
-            "Notification status (Slack/Telegram/Email sent)"
+            "Download incident report PDF",
+            "NFT token proof + transaction hash",
+            "Reward claim button for verified users",
+            "Notification status (Slack/Telegram/Email)"
           ],
           "UX_flow": [
-            "User navigates from dashboard by clicking an incident",
-            "User reviews all images and agent transcript",
-            "User downloads PDF report if needed",
-            "User can navigate back to Dashboard or adjacent incidents"
+            "User navigates from dashboard",
+            "Reviews images, transcript, carbon impact",
+            "Can download PDF or claim NFT/reward via wallet",
+            "Back navigation to dashboard or adjacent incidents"
           ]
         },
         {
           "name": "Image Upload / Submission Page",
           "micro_UI": [
-            "File input for images (single or multiple)",
-            "Camera capture for mobile users",
-            "Metadata inputs: location (auto via geotag), timestamp (auto), optional description",
-            "Submit button triggers agentic pipeline",
-            "Progress bar with real-time pipeline status: Vision Agent -> Verifier Agent -> Geolocation Agent -> Packager Agent",
-            "Success/failure notification"
+            "File input for images (single/multiple)",
+            "Camera capture for mobile",
+            "Metadata: location (geotag auto), timestamp (auto), optional description",
+            "Submit button triggers Somnia/Web3 agentic pipeline",
+            "Progress bar: Vision -> Verifier -> Geolocation -> Packager -> NFT Mint",
+            "Success/failure notifications",
+            "Transaction hash display",
+            "Reward/points earned display"
           ],
           "UX_flow": [
             "User selects images",
             "Metadata auto-filled or manually input",
-            "Submit triggers backend pipeline",
-            "User sees step-by-step progress of agents",
-            "Completion shows incident on dashboard map"
+            "Submit triggers agent pipeline and NFT minting",
+            "User sees progress & reward points",
+            "Incident appears on dashboard map with Web3 verification"
           ]
         }
       ],
       "components": [
-        "Header with app logo, user menu, notifications icon",
-        "Footer with help link and hackathon credits",
-        "Modals for errors, confirmations, and agent step details",
-        "Toast notifications for upload success/failure and new incidents"
+        "Header: logo, user menu, notifications, wallet status",
+        "Footer: help, Somnia/Web3 credits, hackathon credits",
+        "Modals: errors, confirmations, agent step details, reward claims",
+        "Toast notifications for upload success/failure, NFT minted, new incidents",
+        "Leaderboard for top contributors"
       ]
     },
     "backend": {
       "framework": "Python FastAPI",
       "endpoints": [
-        {
-          "path": "/api/upload",
-          "method": "POST",
-          "description": "Accepts image(s) and metadata, triggers agentic pipeline, returns incident ID and pipeline status"
-        },
-        {
-          "path": "/api/incidents",
-          "method": "GET",
-          "description": "Returns list of incidents with filters for date, confidence, region, and status"
-        },
-        {
-          "path": "/api/incidents/{id}",
-          "method": "GET",
-          "description": "Returns detailed incident data including images, polygon, carbon impact, agent transcript"
-        },
-        {
-          "path": "/api/agents/run",
-          "method": "POST",
-          "description": "Trigger agentic workflow for a given image or batch; logs each agent's reasoning and actions"
-        },
-        {
-          "path": "/api/notify",
-          "method": "POST",
-          "description": "Sends notifications to Slack, Telegram, or Email for newly processed incidents"
-        }
+        {"path": "/api/upload", "method": "POST", "description": "Accepts images/metadata, triggers Somnia/Web3 agentic pipeline, returns incident ID, pipeline status, transaction hash, reward points"},
+        {"path": "/api/incidents", "method": "GET", "description": "Returns incidents list with Web3 token verification and reward eligibility"},
+        {"path": "/api/incidents/{id}", "method": "GET", "description": "Returns detailed incident data including NFT proof, agent transcripts, and reward status"},
+        {"path": "/api/agents/run", "method": "POST", "description": "Trigger agentic workflow for images; logs reasoning and NFT minting steps"},
+        {"path": "/api/notify", "method": "POST", "description": "Send alerts to Slack, Telegram, Email, or Web3 dashboard"}
       ],
       "agentic_pipeline_logic": {
-        "step1": "Vision Agent detects deforestation in uploaded images; outputs polygons and confidence score",
-        "step2": "Verifier Agent cross-checks flagged areas using prior images, timestamps, and metadata; outputs verification status",
-        "step3": "Geolocation Agent calculates polygon coordinates, area, and estimated carbon loss",
-        "step4": "Packager Agent generates incident report PDF including images, polygons, carbon estimates, and agent transcripts",
-        "step5": "Notification Agent sends alerts to configured channels (Slack, Telegram, Email)",
-        "error_handling": "If any agent fails, pipeline stops, logs error, notifies user of failure with retry option"
+        "step1": "Vision Agent detects deforestation; outputs polygons & confidence",
+        "step2": "Verifier Agent cross-checks polygons with historical data",
+        "step3": "Geolocation Agent calculates area & carbon impact",
+        "step4": "Packager Agent generates PDF report & agent transcript",
+        "step5": "Decentralization/NFT Agent publishes incident to Somnia, mints NFT/reward tokens",
+        "step6": "Notification Agent sends alerts to users/Slack/Telegram/Email",
+        "error_handling": "Pipeline stops on failure; logs error, notifies user; partial Somnia/NFT commits rolled back"
       },
       "database": {
-        "type": "PostgreSQL (SQLite for demo)",
+        "type": "PostgreSQL (SQLite demo)",
         "tables": [
-          {
-            "name": "incidents",
-            "columns": ["id", "timestamp", "polygon_geojson", "confidence_score", "carbon_estimate", "status", "created_at"]
-          },
-          {
-            "name": "images",
-            "columns": ["id", "incident_id", "url", "source", "metadata"]
-          },
-          {
-            "name": "agent_transcripts",
-            "columns": ["id", "incident_id", "agent_name", "transcript_text", "timestamp"]
-          },
-          {
-            "name": "users",
-            "columns": ["id", "name", "email", "role", "builder_id"]
-          }
+          {"name": "incidents", "columns": ["id","timestamp","polygon_geojson","confidence_score","carbon_estimate","status","somnia_tx_hash","nft_id","created_at"]},
+          {"name": "images", "columns": ["id","incident_id","url","source","metadata"]},
+          {"name": "agent_transcripts", "columns": ["id","incident_id","agent_name","transcript_text","timestamp"]},
+          {"name": "users", "columns": ["id","name","email","role","builder_id","wallet_address","reward_points"]}
         ]
       },
-      "storage": {
-        "type": "S3-compatible or local",
-        "purpose": "Store uploaded images and generated incident packages (PDFs)"
-      },
-      "ml_model": {
-        "type": "Computer Vision - Segmentation",
-        "framework": "PyTorch or TensorFlow",
-        "architecture": "U-Net or MobileNet-based semantic segmentation",
-        "training": "Pretrained weights fine-tuned on deforestation satellite/drone datasets",
-        "inference_endpoint": "FastAPI /api/infer returning polygons, confidence score, and rationale"
-      },
-      "notifications": [
-        "Slack webhook",
-        "Telegram Bot API",
-        "SMTP email notifications"
-      ]
+      "storage": {"type": "Somnia decentralized/IPFS-compatible; S3 fallback", "purpose": "Store images, PDFs, NFTs, agent data"},
+      "ml_model": {"type": "CV Segmentation", "framework": "PyTorch/TensorFlow", "architecture": "U-Net/MobileNet", "training": "Pretrained fine-tuned on deforestation datasets", "inference_endpoint": "/api/infer"},
+      "notifications": ["Slack webhook","Telegram Bot API","SMTP Email","Web3 dashboard alerts"]
     },
     "agents": [
-      {
-        "name": "Vision Agent",
-        "inputs": ["image_url", "metadata"],
-        "outputs": ["polygons", "confidence_score", "short_rationale"],
-        "description": "Detects deforestation/tree loss regions in the image using CV model",
-        "implementation": "PyTorch/TensorFlow inference with polygon extraction"
-      },
-      {
-        "name": "Verifier Agent",
-        "inputs": ["polygons", "timestamp", "metadata"],
-        "outputs": ["verification_status", "recommendation_steps"],
-        "description": "Cross-checks flagged polygons with prior images and metadata to validate deforestation",
-        "implementation": "Amazon Q Developer multi-step workflow agent"
-      },
-      {
-        "name": "Geolocation Agent",
-        "inputs": ["polygons", "metadata"],
-        "outputs": ["geo_coordinates", "area_m2", "estimated_carbon_loss"],
-        "description": "Calculates polygon area and carbon impact based on region-specific factors",
-        "implementation": "GeoPandas / Shapely GIS calculations"
-      },
-      {
-        "name": "Packager Agent",
-        "inputs": ["incident_data", "agent_transcripts"],
-        "outputs": ["incident_report_pdf"],
-        "description": "Generates PDF incident report including images, polygons, carbon estimate, agent transcript",
-        "implementation": "ReportLab or PDFKit"
-      },
-      {
-        "name": "Notification Agent",
-        "inputs": ["incident_id", "channel_list"],
-        "outputs": ["notification_status"],
-        "description": "Sends alerts for completed incidents to Slack, Telegram, Email",
-        "implementation": "Webhook/API integration"
-      }
+      {"name":"Vision Agent","inputs":["image_url","metadata"],"outputs":["polygons","confidence_score","short_rationale"],"description":"Detects tree loss using CV model"},
+      {"name":"Verifier Agent","inputs":["polygons","timestamp","metadata"],"outputs":["verification_status","recommendation_steps"],"description":"Cross-checks flagged areas"},
+      {"name":"Geolocation Agent","inputs":["polygons","metadata"],"outputs":["geo_coordinates","area_m2","estimated_carbon_loss"],"description":"Calculates area and carbon impact"},
+      {"name":"Packager Agent","inputs":["incident_data","agent_transcripts"],"outputs":["incident_report_pdf"],"description":"Generates PDF report with all data"},
+      {"name":"Decentralization/NFT Agent","inputs":["incident_data","PDF"],"outputs":["somnia_tx_hash","nft_id"],"description":"Publishes incident & mints NFT or reward token"},
+      {"name":"Notification Agent","inputs":["incident_id","channel_list"],"outputs":["notification_status"],"description":"Sends alerts to users via Web2/Web3 channels"}
     ],
     "tech_stack": {
-      "frontend": ["React.js", "Tailwind CSS", "Mapbox GL", "Axios for API calls"],
-      "backend": ["Python 3.x", "FastAPI", "Uvicorn", "SQLAlchemy", "Celery for async tasks"],
-      "database": ["PostgreSQL", "SQLite for demo"],
-      "storage": ["AWS S3-compatible or local storage"],
-      "agents": ["Amazon Q Developer CLI/IDE", "Kiro IDE for spec-driven development"],
-      "ml_framework": ["PyTorch/TensorFlow", "OpenCV", "GeoPandas/Shapely"],
-      "notifications": ["Slack API", "Telegram Bot API", "SMTP Email"]
+      "frontend":["React.js","Tailwind CSS","Mapbox GL","Axios","Somnia Wallet SDK","MetaMask SDK"],
+      "backend":["Python 3.x","FastAPI","Uvicorn","SQLAlchemy","Celery","Web3.py"],
+      "database":["PostgreSQL","SQLite demo"],
+      "storage":["Somnia decentralized/IPFS","S3 fallback"],
+      "agents":["Amazon Q Developer CLI/IDE","Kiro IDE","Somnia network agents"],
+      "ml_framework":["PyTorch/TensorFlow","OpenCV","GeoPandas/Shapely"],
+      "notifications":["Slack API","Telegram Bot API","SMTP Email","Web3 dashboard"]
     },
-    "UX_flows": [
-      "Login -> Dashboard -> Filter -> Click incident -> View incident details -> Download report",
-      "Upload image -> Auto-trigger agentic pipeline -> View progress -> Receive notification -> Incident appears on dashboard",
-      "Error in agent pipeline -> Show error toast -> Retry button -> Notify user via email if persistent failure"
+    "UX_flows":[
+      "Login -> Wallet connect -> Dashboard -> Filter -> Click incident -> Claim NFT/reward -> Download PDF -> View leaderboards",
+      "Upload image -> Trigger agentic pipeline -> Mint NFT/reward -> View progress -> Receive notification -> Incident appears on dashboard",
+      "Error in agent pipeline -> Show toast -> Retry -> Notify user -> Rollback partial NFT/Somnia transaction"
     ],
-    "deployment": {
-      "local": "Docker Compose with backend, frontend, database, storage, ML model containers",
-      "cloud": "Optional AWS ECS/Fargate or EC2 deployment with S3 storage for images and PDFs",
-      "steps": [
-        "Build and run backend container",
-        "Build and run frontend container",
-        "Connect database and storage",
-        "Run ML model server",
-        "Execute Amazon Q Developer agent workflows",
-        "Test upload, processing, and notification"
-      ]
+    "deployment":{
+      "local":"Docker Compose with backend, frontend, database, ML model, NFT agent containers",
+      "cloud":"Optional AWS ECS/Fargate or EC2; Somnia network nodes for production",
+      "steps":["Build/run backend & frontend containers","Connect DB & storage","Run ML model server","Execute Amazon Q Developer & Somnia agent workflows","Test NFT/reward minting, upload, notifications"]
     },
-    "demo_requirements": [
+    "demo_requirements":[
       "Small dataset (5–10 satellite/drone images)",
-      "Agentic pipeline demonstrating Vision -> Verifier -> Geolocation -> Packager -> Notification",
-      "Kiro spec file showing automated test generation for incident packager",
-      "Screenshots of Kiro and Amazon Q Developer usage",
-      "Dashboard map with incidents displayed",
+      "Agentic pipeline demonstrating Vision -> Verifier -> Geolocation -> Packager -> NFT/reward -> Notification",
+      "Dashboard map with NFT verification",
+      "Leaderboards showing 40+ user contributions",
       "Downloadable incident report (PDF)",
-      "Notification demo (Slack/Telegram/Email)"
+      "Notification demo (Slack/Telegram/Web3)",
+      "Wallet integration demo (claim NFT/reward)"
     ],
-    "documentation": [
-      "README.md with setup and run instructions",
-      "Agent orchestration explanation and workflow diagram",
-      "ML model training/inference steps",
-      "Frontend and dashboard micro-UI specifications",
-      "Deployment instructions (Docker & optional cloud)"
+    "documentation":[
+      "README.md with setup & run instructions",
+      "Agent orchestration + Somnia/NFT workflow diagram",
+      "ML model training/inference",
+      "Frontend/dashboard micro-UI specs",
+      "Deployment instructions (Docker & optional cloud)",
+      "Web3 wallet setup, NFT minting, transaction verification"
     ]
   },
-  "additional_notes": [
-    "Ensure Amazon Q Developer CLI/IDE and Kiro IDE usage are highlighted in video and README",
-    "Include detailed agent transcripts for each incident in submission",
-    "Focus on modular, scalable architecture and UX-friendly dashboard",
-    "Optional: blockchain timestamping for tamper-proof incident packages",
-    "Include comments and code documentation for clarity"
-  ]
+  "additional_notes":[
+    "Highlight Amazon Q Developer, Kiro IDE, Somnia wallet, and NFT reward usage",
+    "Include detailed agent transcripts for each incident",
+    "Focus on modular architecture, UX-friendly dashboard, and viral utility hooks",
+    "Optional tokenomics plan for eco-token/reward distribution",
+    "Comments and code documentation for clarity"
+  ],
+  "bounty_alignment": {
+    "category":["EcoDeFi Tracker","AI Guardian Bridge","SocialVibe Tokenizer"],
+    "utility":"Real-world utility for environmental monitoring, tokenized rewards for users, NFT incident proof",
+    "growth":"Leaderboard gamification, social sharing, wallet-based reward claiming",
+    "users_goal":"40+ real users engaged",
+    "hype":"Tokenized NFTs, live map, real-time agentic pipeline, Web3 viral hooks"
+  }
 }
