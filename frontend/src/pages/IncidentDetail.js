@@ -83,6 +83,7 @@ const IncidentDetail = () => {
       <p>Status: {incident.incident.status}</p>
       <p>Carbon Estimate: {incident.incident.carbon_estimate} kg CO2</p>
       <p>Confidence: {incident.incident.confidence_score}</p>
+      {incident.incident.somnia_tx_hash && <p>Somnia TX Hash: {incident.incident.somnia_tx_hash}</p>}
       <div className="mb-4" ref={mapContainer} style={{ height: '400px' }} />
       <div>
         <h3>Images</h3>
