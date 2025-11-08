@@ -103,8 +103,26 @@ const IncidentDetail = () => {
       <p>Status: {incident.incident.status}</p>
       <p>Carbon Estimate: {incident.incident.carbon_estimate} kg CO2</p>
       <p>Confidence: {incident.incident.confidence_score}</p>
-      {incident.incident.somnia_tx_hash && <p>Somnia TX Hash: {incident.incident.somnia_tx_hash}</p>}
-      {incident.incident.nft_id && <p>NFT ID: {incident.incident.nft_id}</p>}
+      {incident.incident.zeta_tx_hashes && (
+        <div>
+          <p>ZetaChain TX Hashes:</p>
+          <ul>
+            {Object.entries(incident.incident.zeta_tx_hashes).map(([chain, hash]) => (
+              <li key={chain}>{chain}: {hash}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {incident.incident.nft_ids && (
+        <div>
+          <p>NFT IDs:</p>
+          <ul>
+            {Object.entries(incident.incident.nft_ids).map(([chain, id]) => (
+              <li key={chain}>{chain}: {id}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <p>Assigned to: {users.find(u => u.id === incident.incident.assigned_to)?.name || 'Unassigned'}</p>
       <select onChange={(e) => assignIncident(e.target.value)}>
         <option value="">Assign to...</option>

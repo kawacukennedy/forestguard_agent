@@ -19,7 +19,7 @@ class User(Base):
     hashed_password = Column(String)
     role = Column(Enum(UserRole), default=UserRole.ranger)
     builder_id = Column(String, unique=True)
-    somnia_wallet_address = Column(String)
+    wallet_addresses = Column(JSON)  # Dict of chain: address
     reward_points = Column(Float, default=0.0)
 
 class Incident(Base):
@@ -30,8 +30,8 @@ class Incident(Base):
     confidence_score = Column(Float)
     carbon_estimate = Column(Float)
     status = Column(String)  # e.g., 'pending', 'verified', 'false_positive'
-    somnia_tx_hash = Column(String)
-    nft_id = Column(String, nullable=True)
+    zeta_tx_hashes = Column(JSON)  # Dict of chain: tx_hash
+    nft_ids = Column(JSON, nullable=True)  # Dict of chain: nft_id
     assigned_to = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=datetime.utcnow)
 

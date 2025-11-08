@@ -1,48 +1,42 @@
 {
-  "project": "ForestGuard Agent",
-  "description": "ForestGuard Agent is a Web3-enabled autonomous multi-agent AI system for real-time detection, verification, and reporting of deforestation. It ingests satellite, drone, and community-submitted images, detects tree loss, verifies flagged events, estimates carbon impact, and generates tamper-proof incident packages. Reports are tokenized on the Somnia network (NFTs), enabling verifiable environmental impact tracking. The app combines AI + Web3 to incentivize real users, create hype, and support eco-credits or tokenized rewards.",
-  "goal": "Build a fully functional, semi-vibe-coded or vibe-coded ForestGuard Agent app with frontend, backend, agent workflows, ML inference, notifications, reporting, decentralized storage, Web3 token/NFT integration, and adoption-ready UX flows for 40+ real users. The app should have viral/utility hooks, be hackathon-ready, and comply with Web3 bounty preferences.",
+  "project": "ForestGuard Agent Universal",
+  "description": "ForestGuard Agent Universal is an omnichain AI + Web3 system that detects, verifies, and tokenizes deforestation incidents across Solana, Sui, TON, and other chains via ZetaChain. It integrates AI agents (Vision, Verifier, Geolocation, Packager), mints NFT/reward proofs, and synchronizes them cross-chain. Each incident report is verified, tokenized, and accessible on multiple chains. The app demonstrates true universal connectivity with onCall, onRevert, and onAbort functions enabling seamless cross-chain interactions.",
+  "goal": "Build a fully functional omnichain ForestGuard Agent app that integrates ZetaChain contracts (Gateway, Universal NFT), implements onCall/onRevert/onAbort logic, supports multiple chains, has frontend/backend, agent workflows, ML inference, NFT tokenization, notifications, dashboards, and demo-ready UX for adoption and hackathon submission.",
   "app_architecture": {
     "frontend": {
-      "framework": "React.js + Tailwind CSS + Web3 wallet SDK (MetaMask/Somnia Wallet)",
+      "framework": "React.js + Tailwind CSS + Web3 wallet SDKs (Solana, Sui, TON, Somnia)",
       "pages": [
         {
-          "name": "Login / Registration",
+          "name": "Login / Wallet Connect",
           "micro_UI": [
-            "Email input",
-            "Password input",
-            "Wallet connect (Somnia/MetaMask) for identity & Web3 token/NFT access",
-            "Builder ID login button (Amazon Q Developer/Kiro integration)",
-            "Sign up link",
-            "Forgot password link",
-            "Validation messages for email/password/wallet"
+            "Connect wallets (Solana, Sui, TON, Somnia) for cross-chain authentication",
+            "Email/Password & Builder ID login as fallback",
+            "Validation messages for each wallet and login method"
           ],
           "UX_flow": [
-            "User lands on login page",
-            "Validates Builder ID and wallet",
-            "Wallet unlock triggers access to tokenized reports/NFTs",
-            "Redirects to Dashboard on successful login",
-            "Error messages shown for failed login or wallet connect"
+            "User connects one or multiple wallets",
+            "Wallet unlock triggers access to NFT/reward claims across chains",
+            "Dashboard loads cross-chain incident data",
+            "Errors for failed wallet connections are displayed"
           ]
         },
         {
           "name": "Dashboard / Map View",
           "micro_UI": [
-            "Full-screen Mapbox map showing all incidents as polygons",
-            "Incident pins with hover tooltip (summary + confidence score + NFT proof)",
-            "Sidebar with filters: Date, Confidence, Region, Status, Token Reward Available",
-            "Search bar for incident ID or location",
+            "Full-screen Mapbox map showing all incidents across chains",
+            "Incident pins with hover tooltips (summary, confidence, NFT proof, chain info)",
+            "Sidebar filters: Date, Confidence, Region, Status, Reward Available, Chain",
+            "Search bar for incident ID/location",
             "Add new image button (file uploader)",
-            "Refresh button for latest incidents",
-            "Leaderboard / user contribution stats",
-            "Network & wallet connection status"
+            "Refresh button for latest cross-chain incidents",
+            "Leaderboard showing contributions across chains",
+            "Network & wallet connection indicators"
           ],
           "UX_flow": [
-            "User sees all incidents with NFT tokenized verification",
+            "User sees incidents from all chains",
             "Filters reduce map clutter",
             "Clicking polygon opens Incident Detail page",
-            "Hovering pin shows quick info + reward availability",
-            "Wallet connection allows claiming rewards for submissions"
+            "Hovering pin shows info + cross-chain NFT/Reward availability"
           ]
         },
         {
@@ -54,14 +48,14 @@
             "Carbon impact estimate with breakdown",
             "Agent transcript panel (collapsible, scrollable)",
             "Download incident report PDF",
-            "NFT token proof + transaction hash",
-            "Reward claim button for verified users",
-            "Notification status (Slack/Telegram/Email)"
+            "NFT token proof across chains",
+            "Claim reward button (cross-chain tokenized incentives)",
+            "Notification status (Slack/Telegram/Email/Web3 dashboard)"
           ],
           "UX_flow": [
             "User navigates from dashboard",
-            "Reviews images, transcript, carbon impact",
-            "Can download PDF or claim NFT/reward via wallet",
+            "Reviews images, transcripts, carbon impact",
+            "Downloads PDF report or claims NFT reward on selected chain",
             "Back navigation to dashboard or adjacent incidents"
           ]
         },
@@ -70,118 +64,121 @@
           "micro_UI": [
             "File input for images (single/multiple)",
             "Camera capture for mobile",
-            "Metadata: location (geotag auto), timestamp (auto), optional description",
-            "Submit button triggers Somnia/Web3 agentic pipeline",
-            "Progress bar: Vision -> Verifier -> Geolocation -> Packager -> NFT Mint",
+            "Metadata inputs: location (auto via geotag), timestamp (auto), optional description",
+            "Submit button triggers omnichain agentic pipeline",
+            "Progress bar: Vision -> Verifier -> Geolocation -> Packager -> NFT Mint -> Cross-chain sync",
             "Success/failure notifications",
-            "Transaction hash display",
+            "Transaction hashes display for each chain",
             "Reward/points earned display"
           ],
           "UX_flow": [
             "User selects images",
             "Metadata auto-filled or manually input",
-            "Submit triggers agent pipeline and NFT minting",
-            "User sees progress & reward points",
-            "Incident appears on dashboard map with Web3 verification"
+            "Submit triggers AI agent pipeline + ZetaChain omnichain NFT mint",
+            "User sees step-by-step progress and cross-chain synchronization",
+            "Incident appears on dashboard with proof on multiple chains"
           ]
         }
       ],
       "components": [
-        "Header: logo, user menu, notifications, wallet status",
-        "Footer: help, Somnia/Web3 credits, hackathon credits",
+        "Header: logo, user menu, notifications, wallet status, chain selector",
+        "Footer: help, hackathon credits, ZetaChain docs link",
         "Modals: errors, confirmations, agent step details, reward claims",
-        "Toast notifications for upload success/failure, NFT minted, new incidents",
+        "Toast notifications for upload success/failure, NFT minted, cross-chain completion",
         "Leaderboard for top contributors"
       ]
     },
     "backend": {
       "framework": "Python FastAPI",
       "endpoints": [
-        {"path": "/api/upload", "method": "POST", "description": "Accepts images/metadata, triggers Somnia/Web3 agentic pipeline, returns incident ID, pipeline status, transaction hash, reward points"},
-        {"path": "/api/incidents", "method": "GET", "description": "Returns incidents list with Web3 token verification and reward eligibility"},
-        {"path": "/api/incidents/{id}", "method": "GET", "description": "Returns detailed incident data including NFT proof, agent transcripts, and reward status"},
-        {"path": "/api/agents/run", "method": "POST", "description": "Trigger agentic workflow for images; logs reasoning and NFT minting steps"},
-        {"path": "/api/notify", "method": "POST", "description": "Send alerts to Slack, Telegram, Email, or Web3 dashboard"}
+        {"path": "/api/upload", "method": "POST", "description": "Accepts images/metadata, triggers omnichain agent pipeline, returns incident ID, pipeline status, NFT mint hashes on Solana/Sui/TON"},
+        {"path": "/api/incidents", "method": "GET", "description": "Returns list of incidents with filters for date, confidence, region, status, reward availability, chain"},
+        {"path": "/api/incidents/{id}", "method": "GET", "description": "Returns detailed incident data including cross-chain NFT proofs, agent transcripts, reward status"},
+        {"path": "/api/agents/run", "method": "POST", "description": "Triggers AI agents and cross-chain minting; logs reasoning, transaction hashes, onCall/onRevert/onAbort events"},
+        {"path": "/api/notify", "method": "POST", "description": "Send alerts to Slack, Telegram, Email, Web3 dashboards"}
       ],
       "agentic_pipeline_logic": {
         "step1": "Vision Agent detects deforestation; outputs polygons & confidence",
         "step2": "Verifier Agent cross-checks polygons with historical data",
         "step3": "Geolocation Agent calculates area & carbon impact",
         "step4": "Packager Agent generates PDF report & agent transcript",
-        "step5": "Decentralization/NFT Agent publishes incident to Somnia, mints NFT/reward tokens",
-        "step6": "Notification Agent sends alerts to users/Slack/Telegram/Email",
-        "error_handling": "Pipeline stops on failure; logs error, notifies user; partial Somnia/NFT commits rolled back"
+        "step5": "ZetaChain NFT Agent mints incident report NFT on selected chains",
+        "step6": "onCall: triggers cross-chain sync for NFT and metadata",
+        "step7": "onRevert: handles failed mint or chain transaction rollback",
+        "step8": "onAbort: cancels pipeline if unrecoverable errors occur",
+        "step9": "Notification Agent sends alerts to users & dashboards"
       },
       "database": {
         "type": "PostgreSQL (SQLite demo)",
         "tables": [
-          {"name": "incidents", "columns": ["id","timestamp","polygon_geojson","confidence_score","carbon_estimate","status","somnia_tx_hash","nft_id","created_at"]},
-          {"name": "images", "columns": ["id","incident_id","url","source","metadata"]},
-          {"name": "agent_transcripts", "columns": ["id","incident_id","agent_name","transcript_text","timestamp"]},
-          {"name": "users", "columns": ["id","name","email","role","builder_id","wallet_address","reward_points"]}
+          {"name": "incidents","columns":["id","timestamp","polygon_geojson","confidence_score","carbon_estimate","status","zeta_tx_hashes","nft_ids","created_at"]},
+          {"name": "images","columns":["id","incident_id","url","source","metadata"]},
+          {"name": "agent_transcripts","columns":["id","incident_id","agent_name","transcript_text","timestamp"]},
+          {"name": "users","columns":["id","name","email","role","builder_id","wallet_addresses","reward_points"]}
         ]
       },
-      "storage": {"type": "Somnia decentralized/IPFS-compatible; S3 fallback", "purpose": "Store images, PDFs, NFTs, agent data"},
-      "ml_model": {"type": "CV Segmentation", "framework": "PyTorch/TensorFlow", "architecture": "U-Net/MobileNet", "training": "Pretrained fine-tuned on deforestation datasets", "inference_endpoint": "/api/infer"},
-      "notifications": ["Slack webhook","Telegram Bot API","SMTP Email","Web3 dashboard alerts"]
+      "storage": {"type": "IPFS/Somnia decentralized storage or S3 fallback","purpose":"Store images, PDFs, agent data, cross-chain proofs"},
+      "ml_model": {"type": "CV Segmentation","framework":"PyTorch/TensorFlow","architecture":"U-Net/MobileNet","training":"Pretrained fine-tuned on deforestation datasets","inference_endpoint":"/api/infer"},
+      "notifications": ["Slack webhook","Telegram Bot API","SMTP Email","Web3 dashboard"]
     },
     "agents": [
-      {"name":"Vision Agent","inputs":["image_url","metadata"],"outputs":["polygons","confidence_score","short_rationale"],"description":"Detects tree loss using CV model"},
+      {"name":"Vision Agent","inputs":["image_url","metadata"],"outputs":["polygons","confidence_score","short_rationale"],"description":"Detects tree loss"},
       {"name":"Verifier Agent","inputs":["polygons","timestamp","metadata"],"outputs":["verification_status","recommendation_steps"],"description":"Cross-checks flagged areas"},
-      {"name":"Geolocation Agent","inputs":["polygons","metadata"],"outputs":["geo_coordinates","area_m2","estimated_carbon_loss"],"description":"Calculates area and carbon impact"},
-      {"name":"Packager Agent","inputs":["incident_data","agent_transcripts"],"outputs":["incident_report_pdf"],"description":"Generates PDF report with all data"},
-      {"name":"Decentralization/NFT Agent","inputs":["incident_data","PDF"],"outputs":["somnia_tx_hash","nft_id"],"description":"Publishes incident & mints NFT or reward token"},
-      {"name":"Notification Agent","inputs":["incident_id","channel_list"],"outputs":["notification_status"],"description":"Sends alerts to users via Web2/Web3 channels"}
+      {"name":"Geolocation Agent","inputs":["polygons","metadata"],"outputs":["geo_coordinates","area_m2","estimated_carbon_loss"],"description":"Calculates area & carbon impact"},
+      {"name":"Packager Agent","inputs":["incident_data","agent_transcripts"],"outputs":["incident_report_pdf"],"description":"Generates PDF report"},
+      {"name":"ZetaChain NFT Agent","inputs":["incident_data","PDF"],"outputs":["zeta_tx_hashes","nft_ids"],"description":"Mints NFT across Solana/Sui/TON with onCall/onRevert/onAbort hooks"},
+      {"name":"Notification Agent","inputs":["incident_id","channel_list"],"outputs":["notification_status"],"description":"Sends alerts to users"}
     ],
     "tech_stack": {
-      "frontend":["React.js","Tailwind CSS","Mapbox GL","Axios","Somnia Wallet SDK","MetaMask SDK"],
-      "backend":["Python 3.x","FastAPI","Uvicorn","SQLAlchemy","Celery","Web3.py"],
+      "frontend":["React.js","Tailwind CSS","Mapbox GL","Axios","Wallet SDKs: Solana/Sui/TON/Somnia"],
+      "backend":["Python 3.x","FastAPI","Uvicorn","SQLAlchemy","Celery","Web3.py","ZetaChain SDK"],
       "database":["PostgreSQL","SQLite demo"],
-      "storage":["Somnia decentralized/IPFS","S3 fallback"],
-      "agents":["Amazon Q Developer CLI/IDE","Kiro IDE","Somnia network agents"],
+      "storage":["IPFS/Somnia","S3 fallback"],
+      "agents":["Amazon Q Developer CLI/IDE","Kiro IDE","ZetaChain agents"],
       "ml_framework":["PyTorch/TensorFlow","OpenCV","GeoPandas/Shapely"],
       "notifications":["Slack API","Telegram Bot API","SMTP Email","Web3 dashboard"]
     },
     "UX_flows":[
-      "Login -> Wallet connect -> Dashboard -> Filter -> Click incident -> Claim NFT/reward -> Download PDF -> View leaderboards",
-      "Upload image -> Trigger agentic pipeline -> Mint NFT/reward -> View progress -> Receive notification -> Incident appears on dashboard",
-      "Error in agent pipeline -> Show toast -> Retry -> Notify user -> Rollback partial NFT/Somnia transaction"
+      "Login -> Connect wallets -> Dashboard -> Filter -> Click incident -> Claim NFT across chains -> Download PDF",
+      "Upload image -> Trigger AI pipeline -> Mint NFT via ZetaChain -> onCall/onRevert/onAbort handled -> View progress -> Receive notification",
+      "Error in pipeline -> Show toast -> Retry -> Partial rollback across chains if necessary"
     ],
     "deployment":{
-      "local":"Docker Compose with backend, frontend, database, ML model, NFT agent containers",
-      "cloud":"Optional AWS ECS/Fargate or EC2; Somnia network nodes for production",
-      "steps":["Build/run backend & frontend containers","Connect DB & storage","Run ML model server","Execute Amazon Q Developer & Somnia agent workflows","Test NFT/reward minting, upload, notifications"]
+      "local":"Docker Compose with backend, frontend, ML model, NFT/ZetaChain agent containers",
+      "cloud":"Optional AWS ECS/Fargate or EC2; ZetaChain testnet nodes for cross-chain deployment",
+      "steps":["Build/run backend & frontend","Connect DB & storage","Run ML model server","Deploy ZetaChain testnet contracts","Execute AI + cross-chain NFT agent workflows","Test NFT/reward minting & multi-chain sync"]
     },
     "demo_requirements":[
       "Small dataset (5–10 satellite/drone images)",
-      "Agentic pipeline demonstrating Vision -> Verifier -> Geolocation -> Packager -> NFT/reward -> Notification",
-      "Dashboard map with NFT verification",
-      "Leaderboards showing 40+ user contributions",
-      "Downloadable incident report (PDF)",
+      "Pipeline demonstrating Vision -> Verifier -> Geolocation -> Packager -> ZetaChain NFT -> Cross-chain sync -> Notification",
+      "Dashboard map with cross-chain NFT verification",
+      "Wallet integration demo (claim NFT/reward on Solana/Sui/TON)",
+      "Downloadable PDF report",
       "Notification demo (Slack/Telegram/Web3)",
-      "Wallet integration demo (claim NFT/reward)"
+      "Leaderboard for 40+ users"
     ],
     "documentation":[
-      "README.md with setup & run instructions",
-      "Agent orchestration + Somnia/NFT workflow diagram",
-      "ML model training/inference",
+      "README.md with setup, run, and ZetaChain testnet instructions",
+      "Agent orchestration + cross-chain workflow diagram",
+      "ML model training/inference steps",
       "Frontend/dashboard micro-UI specs",
       "Deployment instructions (Docker & optional cloud)",
-      "Web3 wallet setup, NFT minting, transaction verification"
+      "Wallet setup, NFT minting, cross-chain verification, onCall/onRevert/onAbort explanation"
     ]
   },
   "additional_notes":[
-    "Highlight Amazon Q Developer, Kiro IDE, Somnia wallet, and NFT reward usage",
+    "Highlight Amazon Q Developer, Kiro IDE, ZetaChain SDK usage",
     "Include detailed agent transcripts for each incident",
     "Focus on modular architecture, UX-friendly dashboard, and viral utility hooks",
     "Optional tokenomics plan for eco-token/reward distribution",
     "Comments and code documentation for clarity"
   ],
   "bounty_alignment": {
-    "category":["EcoDeFi Tracker","AI Guardian Bridge","SocialVibe Tokenizer"],
-    "utility":"Real-world utility for environmental monitoring, tokenized rewards for users, NFT incident proof",
+    "category":["Universal App / Omnichain Connectivity"],
+    "utility":"Real-world utility for environmental monitoring, cross-chain NFT/reward minting, multi-chain verifiable data",
     "growth":"Leaderboard gamification, social sharing, wallet-based reward claiming",
     "users_goal":"40+ real users engaged",
-    "hype":"Tokenized NFTs, live map, real-time agentic pipeline, Web3 viral hooks"
+    "hype":"Cross-chain NFTs, live map, AI agentic pipeline, Web3 viral hooks",
+    "ZetaChain_testnet":"Implemented with Gateway and Universal NFT contracts, supports Solana/Sui/TON"
   }
 }

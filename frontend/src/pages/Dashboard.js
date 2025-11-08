@@ -4,7 +4,7 @@ import mapboxgl from 'mapbox-gl';
 
 const Dashboard = () => {
   const [incidents, setIncidents] = useState([]);
-  const [filters, setFilters] = useState({ date_from: '', confidence_min: 0, status: '', search: '' });
+  const [filters, setFilters] = useState({ date_from: '', confidence_min: 0, status: '', chain: '', search: '' });
   const mapContainer = useRef(null);
   const map = useRef(null);
   const markers = useRef([]);
@@ -30,6 +30,7 @@ const Dashboard = () => {
     if (filters.date_from) params.date_from = filters.date_from;
     if (filters.confidence_min > 0) params.confidence_min = filters.confidence_min;
     if (filters.status) params.status = filters.status;
+    if (filters.chain) params.chain = filters.chain;
     if (filters.search) params.search = filters.search;
     const response = await axios.get('http://localhost:8000/api/incidents', {
       headers: { Authorization: `Bearer ${token}` },
@@ -103,6 +104,15 @@ const Dashboard = () => {
             <option value="">All</option>
             <option value="pending">Pending</option>
             <option value="processed">Processed</option>
+          </select>
+        </div>
+        <div className="mb-4">
+          <label>Chain:</label>
+          <select value={filters.chain} onChange={(e) => setFilters({...filters, chain: e.target.value})} className="w-full px-2 py-1 border rounded">
+            <option value="">All</option>
+            <option value="solana">Solana</option>
+            <option value="sui">Sui</option>
+            <option value="ton">TON</option>
           </select>
         </div>
         <button onClick={() => window.location.href = '/upload'} className="w-full bg-blue-600 text-white px-4 py-2 rounded mb-4">Upload Image</button>

@@ -55,7 +55,8 @@ const Upload = () => {
         } else if (data.type === 'incident_update' && data.incident_id === incidentId) {
           setProgress(100);
           setStatus('Complete');
-          setToast({ message: `Upload and processing successful! Earned ${data.reward_points} reward points.`, type: 'success' });
+          const txMessage = data.zeta_tx_hashes ? `NFT minted on: ${Object.keys(data.zeta_tx_hashes).join(', ')}` : '';
+          setToast({ message: `Upload and processing successful! Earned ${data.reward_points} reward points. ${txMessage}`, type: 'success' });
           websocket.close();
           setTimeout(() => window.location.href = '/dashboard', 1000);
         }

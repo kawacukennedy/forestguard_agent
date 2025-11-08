@@ -1,26 +1,28 @@
-# ForestGuard Agent
+# ForestGuard Agent Universal
 
-An autonomous, multi-agent AI system for real-time detection, verification, and reporting of deforestation events. The system ingests satellite, drone, and community-submitted images, detects tree loss, verifies flagged events through multi-agent reasoning, estimates carbon impact, and auto-generates incident packages for NGOs, park rangers, and authorities.
+An omnichain AI + Web3 system that detects, verifies, and tokenizes deforestation incidents across Solana, Sui, TON, and other chains via ZetaChain. It integrates AI agents (Vision, Verifier, Geolocation, Packager), mints NFT/reward proofs, and synchronizes them cross-chain. Each incident report is verified, tokenized, and accessible on multiple chains. The app demonstrates true universal connectivity with onCall, onRevert, and onAbort functions enabling seamless cross-chain interactions.
 
 ## Features
 
-- **Image Upload & Processing**: Upload images with metadata, automatic pipeline triggering.
-- **Agentic Pipeline**: Vision Agent (ML detection), Verifier Agent (cross-verification), Geolocation Agent (area & carbon calc), Packager Agent (PDF reports), Decentralization Agent (Somnia publishing), Notification Agent (alerts).
-- **Dashboard**: Mapbox-powered map with incident polygons, filters by date, confidence, status, search bar.
-- **Incident Details**: View images, transcripts, carbon estimates, Somnia hash, download PDFs, navigation.
-- **Authentication**: Builder ID integration (mock), Somnia wallet connection, JWT tokens.
-- **Notifications**: Slack, Telegram, Email.
-- **Storage**: Somnia decentralized storage (IPFS-compatible) with S3/local fallback.
+- **Omnichain NFT Minting**: Mint incident NFTs across Solana, Sui, TON via ZetaChain Gateway and Universal NFT contracts.
+- **Cross-Chain Synchronization**: onCall/onRevert/onAbort hooks for seamless multi-chain interactions.
+- **Image Upload & Processing**: Upload images with metadata, automatic omnichain pipeline triggering.
+- **Agentic Pipeline**: Vision Agent (ML detection), Verifier Agent (cross-verification), Geolocation Agent (area & carbon calc), Packager Agent (PDF reports), ZetaChain NFT Agent (cross-chain minting), Notification Agent (alerts).
+- **Dashboard**: Mapbox-powered map with incident polygons, filters by date, confidence, status, chain, search bar.
+- **Incident Details**: View images, transcripts, carbon estimates, cross-chain TX hashes, NFT IDs, download PDFs, claim rewards.
+- **Authentication**: Builder ID integration (mock), multi-wallet connection (Solana/Sui/TON/Somnia), JWT tokens.
+- **Notifications**: Slack, Telegram, Email, Web3 dashboards.
+- **Storage**: IPFS/Somnia decentralized storage with S3/local fallback.
 - **Async Processing**: Celery for background tasks.
-- **Decentralized Verification**: Blockchain timestamping and Somnia transaction hashes for tamper-proof records.
+- **Universal Verification**: Cross-chain timestamping and NFT proofs for tamper-proof records.
 
 ## Architecture
 
-- **Frontend**: React + Tailwind CSS, Mapbox GL.
-- **Backend**: FastAPI, PostgreSQL/SQLite, Celery + Redis.
+- **Frontend**: React + Tailwind CSS + Web3 wallet SDKs (Solana/Sui/TON/Somnia), Mapbox GL.
+- **Backend**: FastAPI, PostgreSQL/SQLite, Celery + Redis, ZetaChain SDK.
 - **ML**: PyTorch U-Net for segmentation.
-- **Agents**: Python scripts for each agent.
-- **Deployment**: Docker Compose.
+- **Agents**: Python scripts for each agent, ZetaChain integration.
+- **Deployment**: Docker Compose, ZetaChain testnet.
 
 ## Setup & Run
 
@@ -77,35 +79,38 @@ TELEGRAM_BOT_TOKEN=...
 EMAIL_SMTP_SERVER=smtp.gmail.com
 EMAIL_USERNAME=...
 EMAIL_PASSWORD=...
-SOMNIA_NODE_URL=https://somnia-node.example.com
-SOMNIA_API_KEY=your-somnia-key
+ZETACHAIN_TESTNET_RPC=https://zetachain-testnet.example.com
+ZETACHAIN_PRIVATE_KEY=your-private-key
 ```
 
 Frontend `.env`:
 ```
 REACT_APP_MAPBOX_TOKEN=your-mapbox-token
-REACT_APP_SOMNIA_WALLET_SDK_URL=https://somnia-wallet-sdk.example.com
+REACT_APP_SOLANA_RPC=https://api.mainnet-beta.solana.com
+REACT_APP_SUI_RPC=https://fullnode.mainnet.sui.io
+REACT_APP_TON_RPC=https://toncenter.com/api/v2/jsonRPC
 ```
 
 ## Usage
 
-1. Register/Login with Builder ID and connect wallet.
-2. Upload images on /upload; earn reward points upon completion.
-3. View processing progress and NFT minting.
-4. See incidents on /dashboard map with NFT proofs.
-5. Click incident for details, download PDF, claim rewards.
-6. Check leaderboard on /stats for top contributors.
+1. Register/Login with Builder ID and connect multi-chain wallets (Solana/Sui/TON).
+2. Upload images on /upload; earn reward points upon cross-chain NFT minting.
+3. View processing progress with onCall/onRevert/onAbort status.
+4. See incidents on /dashboard map with cross-chain NFT proofs.
+5. Click incident for details, download PDF, claim rewards on selected chain.
+6. Check leaderboard on /stats for top contributors across chains.
 
 ## Agent Orchestration
 
-Built with Amazon Q Developer for code generation, Kiro for spec-driven development, and Somnia for decentralized agent execution. Agents run sequentially: Vision -> Verifier -> Geolocation -> Packager -> Decentralization -> Notification.
+Built with Amazon Q Developer for code generation, Kiro for spec-driven development, and ZetaChain for omnichain NFT minting. Agents run sequentially: Vision -> Verifier -> Geolocation -> Packager -> ZetaChain NFT (onCall/onRevert/onAbort) -> Notification.
 
-### Somnia Integration
+### ZetaChain Omnichain Integration
 
-- **Wallet Setup**: Register with a Somnia wallet address for decentralized identity.
-- **Decentralized Storage**: Images and reports are stored on Somnia network for tamper-proof access.
-- **Transaction Verification**: Each incident includes a Somnia transaction hash for blockchain verification.
-- **Network Status**: Real-time indicator shows Somnia node connection.
+- **Universal NFT Minting**: Incidents are minted as NFTs on multiple chains (Solana, Sui, TON) using ZetaChain Gateway and Universal NFT contracts.
+- **onCall/onRevert/onAbort Hooks**: Seamless cross-chain synchronization with rollback on failure.
+- **Multi-Chain Wallets**: Connect wallets across chains for identity and reward claiming.
+- **Cross-Chain Verification**: NFT proofs are verifiable on any supported chain.
+- **Testnet Deployment**: Use ZetaChain testnet for development and demo.
 
 ### Web3 Features
 
@@ -136,12 +141,12 @@ Simple U-Net for semantic segmentation. Train on deforestation datasets for bett
 The API is documented with Swagger UI at `http://localhost:8000/docs` when running the backend.
 
 - `POST /api/upload`: Accepts image(s) and metadata, triggers Somnia agentic pipeline, returns incident ID, pipeline status, and Somnia transaction hash
-- `GET /api/incidents`: Returns list of incidents with filters for date, confidence, region, status, and Somnia verification
-- `GET /api/incidents/{id}`: Returns detailed incident data including images, polygon, carbon impact, agent transcript, and Somnia hash
+- `GET /api/incidents`: Returns list of incidents with filters for date, confidence, region, status, chain, and cross-chain verification
+- `GET /api/incidents/{id}`: Returns detailed incident data including images, polygon, carbon impact, agent transcript, and cross-chain TX hashes/NFT IDs
 - `GET /api/incidents/stats`: Returns statistics on incidents, carbon impact, and trends
-- `GET /api/incidents/leaderboard`: Returns top users by reward points
-- `POST /api/agents/run`: Trigger Somnia agentic workflow for given images or batch; logs each agent's reasoning and outputs decentralized proofs
-- `POST /api/notify`: Sends notifications to Slack, Telegram, or Email for newly processed incidents
+- `GET /api/incidents/leaderboard`: Returns top users by reward points across chains
+- `POST /api/agents/run`: Trigger omnichain agentic workflow; logs reasoning, transaction hashes, onCall/onRevert/onAbort events
+- `POST /api/notify`: Send alerts to Slack, Telegram, Email, or Web3 dashboards
 - `POST /api/infer`: Direct ML inference on uploaded images
 
 ## Contributing

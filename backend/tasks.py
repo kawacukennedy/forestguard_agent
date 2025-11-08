@@ -5,7 +5,7 @@ from ..agents.vision_agent import run_vision_agent
 from ..agents.verifier_agent import run_verifier_agent
 from ..agents.geolocation_agent import run_geolocation_agent
 from ..agents.packager_agent import run_packager_agent
-from ..agents.decentralization_agent import run_decentralization_agent
+from ..agents.zeta_agent import run_zeta_agent
 from ..agents.notification_agent import run_notification_agent
 from .main import broadcast_incident_update
 
@@ -56,11 +56,11 @@ def run_pipeline(self, incident_id: str):
             raise
 
         try:
-            decentralization_result = run_decentralization_agent({"id": incident_id, "carbon_estimate": geo_result["estimated_carbon_loss"]}, packager_result)
-            db.add(AgentTranscript(incident_id=incident_id, agent_name="Decentralization", transcript_text=str(decentralization_result)))
-            asyncio.run(broadcast_incident_update({"type": "progress", "incident_id": incident_id, "step": "Decentralization", "status": "completed"}))
+            zeta_result = run_zeta_agent({"id": incident_id, "carbon_estimate": geo_result["estimated_carbon_loss"]}, packager_result)
+            db.add(AgentTranscript(incident_id=incident_id, agent_name="ZetaChain NFT", transcript_text=str(zeta_result)))
+            asyncio.run(broadcast_incident_update({"type": "progress", "incident_id": incident_id, "step": "ZetaChain NFT", "status": "completed"}))
         except Exception as e:
-            db.add(AgentTranscript(incident_id=incident_id, agent_name="Decentralization", transcript_text=f"Error: {str(e)}"))
+            db.add(AgentTranscript(incident_id=incident_id, agent_name="ZetaChain NFT", transcript_text=f"Error: {str(e)}"))
             raise
 
         try:
@@ -74,15 +74,15 @@ def run_pipeline(self, incident_id: str):
         incident.polygon_geojson = str(vision_result["polygons"])
         incident.confidence_score = vision_result["confidence_score"]
         incident.carbon_estimate = geo_result["estimated_carbon_loss"]
-        incident.somnia_tx_hash = decentralization_result["somnia_tx_hash"]
-        incident.nft_id = decentralization_result["nft_id"]
+        incident.zeta_tx_hashes = zeta_result["zeta_tx_hashes"]
+        incident.nft_ids = zeta_result["nft_ids"]
         incident.status = "processed"
 
         # Assign reward points to the user
         if incident.assigned_to:
             user = db.query(User).filter(User.id == incident.assigned_to).first()
             if user:
-                user.reward_points += decentralization_result["reward_points"]
+                user.reward_points += zeta_result["reward_points"]
 
         db.commit()
 
@@ -92,9 +92,9 @@ def run_pipeline(self, incident_id: str):
             "type": "incident_update",
             "incident_id": incident_id,
             "status": "processed",
-            "somnia_tx_hash": decentralization_result["somnia_tx_hash"],
-            "nft_id": decentralization_result["nft_id"],
-            "reward_points": decentralization_result["reward_points"]
+            "zeta_tx_hashes": zeta_result["zeta_tx_hashes"],
+            "nft_ids": zeta_result["nft_ids"],
+            "reward_points": zeta_result["reward_points"]
         }))
     except Exception as e:
         db.rollback()

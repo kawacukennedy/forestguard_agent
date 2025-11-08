@@ -16,8 +16,9 @@ async def get_incidents(
     confidence_min: float = Query(None),
     region: str = Query(None),
     status: str = Query(None),
+    chain: str = Query(None),
     search: str = Query(None)
- ):
+  ):
     query = db.query(Incident)
     if date_from:
         query = query.filter(Incident.timestamp >= date_from)
@@ -28,6 +29,9 @@ async def get_incidents(
         pass
     if status:
         query = query.filter(Incident.status == status)
+    if chain:
+        # Filter by chain if nft_ids contains the chain
+        query = query.filter(Incident.nft_ids.op('->')(chain).isnot(None))
     if search:
         query = query.filter(Incident.id.contains(search))
     incidents = query.all()
