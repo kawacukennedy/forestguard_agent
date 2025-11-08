@@ -1,0 +1,249 @@
+{
+  "project": "ForestGuard Agent",
+  "description": "ForestGuard Agent is an autonomous, multi-agent AI system for real-time detection, verification, and reporting of deforestation events. The system ingests satellite, drone, and community-submitted images, detects tree loss, verifies flagged events through multi-agent reasoning, estimates carbon impact, and auto-generates incident packages for NGOs, park rangers, and authorities. The app includes a web dashboard, real-time notifications, and a complete agent orchestration using Amazon Q Developer and Kiro.",
+  "goal": "Generate a fully functional, production-ready ForestGuard Agent app with complete frontend, backend, agent workflows, ML inference, notifications, reporting, UX/UI flows, and deployment instructions.",
+  "app_architecture": {
+    "frontend": {
+      "framework": "React.js + Tailwind CSS",
+      "pages": [
+        {
+          "name": "Login / Registration",
+          "micro_UI": [
+            "Email input",
+            "Password input",
+            "Builder ID login button (integrates with Amazon Q Developer/Kiro)",
+            "Sign up link",
+            "Forgot password link",
+            "Validation messages for email/password"
+          ],
+          "UX_flow": [
+            "User lands on login page",
+            "Validates Builder ID credentials",
+            "Redirects to Dashboard on successful login",
+            "Error message display for failed login"
+          ]
+        },
+        {
+          "name": "Dashboard / Map View",
+          "micro_UI": [
+            "Full-screen map (Mapbox GL) showing all incidents as polygons",
+            "Incident pins with hover tooltip (summary + confidence score)",
+            "Sidebar with filter options: Date, Confidence Score, Region, Status",
+            "Search bar for incident ID or location",
+            "Add new image button (file uploader)",
+            "Refresh button for latest incidents"
+          ],
+          "UX_flow": [
+            "User sees map with all incidents",
+            "User can filter incidents to reduce clutter",
+            "Clicking an incident polygon opens Incident Detail page",
+            "Hovering incident pin shows quick info tooltip"
+          ]
+        },
+        {
+          "name": "Incident Detail Page",
+          "micro_UI": [
+            "Incident ID, timestamp, status badge",
+            "Polygon map zoomed to incident",
+            "List of uploaded images (thumbnails + full preview on click)",
+            "Carbon impact estimate with formula breakdown",
+            "Agent transcript panel (collapsible, scrollable)",
+            "Download incident report button (PDF)",
+            "Notification status (Slack/Telegram/Email sent)"
+          ],
+          "UX_flow": [
+            "User navigates from dashboard by clicking an incident",
+            "User reviews all images and agent transcript",
+            "User downloads PDF report if needed",
+            "User can navigate back to Dashboard or adjacent incidents"
+          ]
+        },
+        {
+          "name": "Image Upload / Submission Page",
+          "micro_UI": [
+            "File input for images (single or multiple)",
+            "Camera capture for mobile users",
+            "Metadata inputs: location (auto via geotag), timestamp (auto), optional description",
+            "Submit button triggers agentic pipeline",
+            "Progress bar with real-time pipeline status: Vision Agent -> Verifier Agent -> Geolocation Agent -> Packager Agent",
+            "Success/failure notification"
+          ],
+          "UX_flow": [
+            "User selects images",
+            "Metadata auto-filled or manually input",
+            "Submit triggers backend pipeline",
+            "User sees step-by-step progress of agents",
+            "Completion shows incident on dashboard map"
+          ]
+        }
+      ],
+      "components": [
+        "Header with app logo, user menu, notifications icon",
+        "Footer with help link and hackathon credits",
+        "Modals for errors, confirmations, and agent step details",
+        "Toast notifications for upload success/failure and new incidents"
+      ]
+    },
+    "backend": {
+      "framework": "Python FastAPI",
+      "endpoints": [
+        {
+          "path": "/api/upload",
+          "method": "POST",
+          "description": "Accepts image(s) and metadata, triggers agentic pipeline, returns incident ID and pipeline status"
+        },
+        {
+          "path": "/api/incidents",
+          "method": "GET",
+          "description": "Returns list of incidents with filters for date, confidence, region, and status"
+        },
+        {
+          "path": "/api/incidents/{id}",
+          "method": "GET",
+          "description": "Returns detailed incident data including images, polygon, carbon impact, agent transcript"
+        },
+        {
+          "path": "/api/agents/run",
+          "method": "POST",
+          "description": "Trigger agentic workflow for a given image or batch; logs each agent's reasoning and actions"
+        },
+        {
+          "path": "/api/notify",
+          "method": "POST",
+          "description": "Sends notifications to Slack, Telegram, or Email for newly processed incidents"
+        }
+      ],
+      "agentic_pipeline_logic": {
+        "step1": "Vision Agent detects deforestation in uploaded images; outputs polygons and confidence score",
+        "step2": "Verifier Agent cross-checks flagged areas using prior images, timestamps, and metadata; outputs verification status",
+        "step3": "Geolocation Agent calculates polygon coordinates, area, and estimated carbon loss",
+        "step4": "Packager Agent generates incident report PDF including images, polygons, carbon estimates, and agent transcripts",
+        "step5": "Notification Agent sends alerts to configured channels (Slack, Telegram, Email)",
+        "error_handling": "If any agent fails, pipeline stops, logs error, notifies user of failure with retry option"
+      },
+      "database": {
+        "type": "PostgreSQL (SQLite for demo)",
+        "tables": [
+          {
+            "name": "incidents",
+            "columns": ["id", "timestamp", "polygon_geojson", "confidence_score", "carbon_estimate", "status", "created_at"]
+          },
+          {
+            "name": "images",
+            "columns": ["id", "incident_id", "url", "source", "metadata"]
+          },
+          {
+            "name": "agent_transcripts",
+            "columns": ["id", "incident_id", "agent_name", "transcript_text", "timestamp"]
+          },
+          {
+            "name": "users",
+            "columns": ["id", "name", "email", "role", "builder_id"]
+          }
+        ]
+      },
+      "storage": {
+        "type": "S3-compatible or local",
+        "purpose": "Store uploaded images and generated incident packages (PDFs)"
+      },
+      "ml_model": {
+        "type": "Computer Vision - Segmentation",
+        "framework": "PyTorch or TensorFlow",
+        "architecture": "U-Net or MobileNet-based semantic segmentation",
+        "training": "Pretrained weights fine-tuned on deforestation satellite/drone datasets",
+        "inference_endpoint": "FastAPI /api/infer returning polygons, confidence score, and rationale"
+      },
+      "notifications": [
+        "Slack webhook",
+        "Telegram Bot API",
+        "SMTP email notifications"
+      ]
+    },
+    "agents": [
+      {
+        "name": "Vision Agent",
+        "inputs": ["image_url", "metadata"],
+        "outputs": ["polygons", "confidence_score", "short_rationale"],
+        "description": "Detects deforestation/tree loss regions in the image using CV model",
+        "implementation": "PyTorch/TensorFlow inference with polygon extraction"
+      },
+      {
+        "name": "Verifier Agent",
+        "inputs": ["polygons", "timestamp", "metadata"],
+        "outputs": ["verification_status", "recommendation_steps"],
+        "description": "Cross-checks flagged polygons with prior images and metadata to validate deforestation",
+        "implementation": "Amazon Q Developer multi-step workflow agent"
+      },
+      {
+        "name": "Geolocation Agent",
+        "inputs": ["polygons", "metadata"],
+        "outputs": ["geo_coordinates", "area_m2", "estimated_carbon_loss"],
+        "description": "Calculates polygon area and carbon impact based on region-specific factors",
+        "implementation": "GeoPandas / Shapely GIS calculations"
+      },
+      {
+        "name": "Packager Agent",
+        "inputs": ["incident_data", "agent_transcripts"],
+        "outputs": ["incident_report_pdf"],
+        "description": "Generates PDF incident report including images, polygons, carbon estimate, agent transcript",
+        "implementation": "ReportLab or PDFKit"
+      },
+      {
+        "name": "Notification Agent",
+        "inputs": ["incident_id", "channel_list"],
+        "outputs": ["notification_status"],
+        "description": "Sends alerts for completed incidents to Slack, Telegram, Email",
+        "implementation": "Webhook/API integration"
+      }
+    ],
+    "tech_stack": {
+      "frontend": ["React.js", "Tailwind CSS", "Mapbox GL", "Axios for API calls"],
+      "backend": ["Python 3.x", "FastAPI", "Uvicorn", "SQLAlchemy", "Celery for async tasks"],
+      "database": ["PostgreSQL", "SQLite for demo"],
+      "storage": ["AWS S3-compatible or local storage"],
+      "agents": ["Amazon Q Developer CLI/IDE", "Kiro IDE for spec-driven development"],
+      "ml_framework": ["PyTorch/TensorFlow", "OpenCV", "GeoPandas/Shapely"],
+      "notifications": ["Slack API", "Telegram Bot API", "SMTP Email"]
+    },
+    "UX_flows": [
+      "Login -> Dashboard -> Filter -> Click incident -> View incident details -> Download report",
+      "Upload image -> Auto-trigger agentic pipeline -> View progress -> Receive notification -> Incident appears on dashboard",
+      "Error in agent pipeline -> Show error toast -> Retry button -> Notify user via email if persistent failure"
+    ],
+    "deployment": {
+      "local": "Docker Compose with backend, frontend, database, storage, ML model containers",
+      "cloud": "Optional AWS ECS/Fargate or EC2 deployment with S3 storage for images and PDFs",
+      "steps": [
+        "Build and run backend container",
+        "Build and run frontend container",
+        "Connect database and storage",
+        "Run ML model server",
+        "Execute Amazon Q Developer agent workflows",
+        "Test upload, processing, and notification"
+      ]
+    },
+    "demo_requirements": [
+      "Small dataset (5–10 satellite/drone images)",
+      "Agentic pipeline demonstrating Vision -> Verifier -> Geolocation -> Packager -> Notification",
+      "Kiro spec file showing automated test generation for incident packager",
+      "Screenshots of Kiro and Amazon Q Developer usage",
+      "Dashboard map with incidents displayed",
+      "Downloadable incident report (PDF)",
+      "Notification demo (Slack/Telegram/Email)"
+    ],
+    "documentation": [
+      "README.md with setup and run instructions",
+      "Agent orchestration explanation and workflow diagram",
+      "ML model training/inference steps",
+      "Frontend and dashboard micro-UI specifications",
+      "Deployment instructions (Docker & optional cloud)"
+    ]
+  },
+  "additional_notes": [
+    "Ensure Amazon Q Developer CLI/IDE and Kiro IDE usage are highlighted in video and README",
+    "Include detailed agent transcripts for each incident in submission",
+    "Focus on modular, scalable architecture and UX-friendly dashboard",
+    "Optional: blockchain timestamping for tamper-proof incident packages",
+    "Include comments and code documentation for clarity"
+  ]
+}
