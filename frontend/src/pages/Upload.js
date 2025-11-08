@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
+import Modal from '../components/Modal';
+import Toast from '../components/Toast';
 
 const Upload = () => {
   const [files, setFiles] = useState([]);
@@ -7,9 +9,19 @@ const Upload = () => {
   const [description, setDescription] = useState('');
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('');
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [toast, setToast] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    setShowConfirm(true);
+  };
+
+  const confirmUpload = async () => {
+    setShowConfirm(false);
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
     formData.append('location', location);
@@ -32,13 +44,33 @@ const Upload = () => {
       setTimeout(() => {
         setProgress(100);
         setStatus('Complete');
-        alert('Upload and processing successful');
-        window.location.href = '/dashboard';
+        setToast({ message: 'Upload and processing successful', type: 'success' });
+        setTimeout(() => window.location.href = '/dashboard', 1000);
       }, 4000);
     } catch (error) {
       setStatus('Failed');
-      alert('Upload failed');
+      setToast({ message: 'Upload failed', type: 'error' });
     }
+  };
+
+  const openCamera = async () => {
+    setCameraOpen(true);
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoRef.current.srcObject = stream;
+  };
+
+  const captureImage = () => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    canvas.toBlob(blob => {
+      const file = new File([blob], 'camera.jpg', { type: 'image/jpeg' });
+      setFiles(prev => [...prev, file]);
+    });
+    setCameraOpen(false);
+    video.srcObject.getTracks().forEach(track => track.stop());
   };
 
   return (
@@ -48,6 +80,7 @@ const Upload = () => {
         <div>
           <label className="block text-sm font-medium">Images</label>
           <input type="file" multiple onChange={(e) => setFiles(Array.from(e.target.files))} className="mt-1 w-full" />
+          <button type="button" onClick={openCamera} className="mt-2 bg-green-600 text-white px-4 py-2 rounded">Open Camera</button>
         </div>
         <div>
           <label className="block text-sm font-medium">Location</label>
@@ -59,6 +92,13 @@ const Upload = () => {
         </div>
         <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded">Upload</button>
       </form>
+      {cameraOpen && (
+        <div className="mt-4">
+          <video ref={videoRef} autoPlay className="w-full"></video>
+          <button onClick={captureImage} className="mt-2 bg-red-600 text-white px-4 py-2 rounded">Capture</button>
+        </div>
+      )}
+      <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
       {progress > 0 && (
         <div className="mt-6">
           <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -67,6 +107,12 @@ const Upload = () => {
           <p className="text-sm mt-2">{status}</p>
         </div>
       )}
+      <Modal isOpen={showConfirm} onClose={() => setShowConfirm(false)} title="Confirm Upload">
+        <p>Are you sure you want to upload {files.length} image(s)?</p>
+        <button onClick={confirmUpload} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded mr-2">Yes</button>
+        <button onClick={() => setShowConfirm(false)} className="mt-4 bg-gray-600 text-white px-4 py-2 rounded">No</button>
+      </Modal>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };

@@ -12,8 +12,9 @@ async def get_incidents(
     date_from: str = Query(None),
     confidence_min: float = Query(None),
     region: str = Query(None),
-    status: str = Query(None)
-):
+    status: str = Query(None),
+    search: str = Query(None)
+ ):
     query = db.query(Incident)
     if date_from:
         query = query.filter(Incident.timestamp >= date_from)
@@ -24,6 +25,8 @@ async def get_incidents(
         pass
     if status:
         query = query.filter(Incident.status == status)
+    if search:
+        query = query.filter(Incident.id.contains(search))
     incidents = query.all()
     return incidents
 

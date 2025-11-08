@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File
 from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import Incident, AgentTranscript, Image
@@ -7,8 +7,24 @@ from ...agents.verifier_agent import run_verifier_agent
 from ...agents.geolocation_agent import run_geolocation_agent
 from ...agents.packager_agent import run_packager_agent
 from ...agents.notification_agent import run_notification_agent
+import tempfile
+import os
 
 router = APIRouter()
+
+@router.post("/infer")
+async def infer_deforestation(file: UploadFile = File(...)):
+    # Save temp file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+        tmp.write(await file.read())
+        tmp_path = tmp.name
+
+    try:
+        # Run vision agent
+        result = run_vision_agent(tmp_path)
+        return result
+    finally:
+        os.unlink(tmp_path)
 
 @router.post("/agents/run")
 async def run_agent_pipeline(incident_id: str, db: Session = Depends(get_db)):
@@ -31,7 +47,7 @@ async def run_agent_pipeline(incident_id: str, db: Session = Depends(get_db)):
 
     transcripts = db.query(AgentTranscript).filter(AgentTranscript.incident_id == incident_id).all()
     transcript_data = [{"agent_name": t.agent_name, "transcript_text": t.transcript_text} for t in transcripts]
-    packager_result = run_packager_agent({"id": incident_id, "carbon_estimate": geo_result["estimated_carbon_loss"], "status": incident.status}, transcript_data, images)
+    packager_result = run_packager_agent({"id": incident_id, "carbon_estimate": geo_result["estimated_carbon_loss"], "status": "processed"}, transcript_data, images)
     db.add(AgentTranscript(incident_id=incident_id, agent_name="Packager", transcript_text=str(packager_result)))
 
     notify_result = run_notification_agent(incident_id, ["slack"])

@@ -4,7 +4,7 @@ import mapboxgl from 'mapbox-gl';
 
 const Dashboard = () => {
   const [incidents, setIncidents] = useState([]);
-  const [filters, setFilters] = useState({ date_from: '', confidence_min: 0, status: '' });
+  const [filters, setFilters] = useState({ date_from: '', confidence_min: 0, status: '', search: '' });
   const mapContainer = useRef(null);
   const map = useRef(null);
   const markers = useRef([]);
@@ -19,6 +19,7 @@ const Dashboard = () => {
     if (filters.date_from) params.date_from = filters.date_from;
     if (filters.confidence_min > 0) params.confidence_min = filters.confidence_min;
     if (filters.status) params.status = filters.status;
+    if (filters.search) params.search = filters.search;
     const response = await axios.get('http://localhost:8000/api/incidents', {
       headers: { Authorization: `Bearer ${token}` },
       params
@@ -73,6 +74,10 @@ const Dashboard = () => {
     <div className="h-screen flex">
       <div className="w-1/4 bg-gray-200 p-4 overflow-y-auto">
         <h3 className="text-lg font-bold mb-4">Filters</h3>
+        <div className="mb-4">
+          <label>Search (ID or Location):</label>
+          <input type="text" value={filters.search} onChange={(e) => setFilters({...filters, search: e.target.value})} placeholder="Incident ID or location" className="w-full px-2 py-1 border rounded" />
+        </div>
         <div className="mb-4">
           <label>Date From:</label>
           <input type="date" value={filters.date_from} onChange={(e) => setFilters({...filters, date_from: e.target.value})} className="w-full px-2 py-1 border rounded" />
