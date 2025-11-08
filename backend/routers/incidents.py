@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import Incident, Image, AgentTranscript
 from typing import List
+import os
 
 router = APIRouter()
 
@@ -42,3 +44,10 @@ async def get_incident(incident_id: str, db: Session = Depends(get_db)):
         "images": images,
         "transcripts": transcripts
     }
+
+@router.get("/incidents/{incident_id}/download")
+async def download_report(incident_id: str):
+    file_path = f"reports/incident_{incident_id}.pdf"
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Report not found")
+    return FileResponse(file_path, media_type='application/pdf', filename=f"incident_{incident_id}.pdf")

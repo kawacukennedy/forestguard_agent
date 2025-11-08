@@ -4,7 +4,8 @@ from reportlab.lib.utils import ImageReader
 import os
 
 def run_packager_agent(incident_data, agent_transcripts, images=[]):
-    filename = f"incident_{incident_data['id']}.pdf"
+    os.makedirs("reports", exist_ok=True)
+    filename = f"reports/incident_{incident_data['id']}.pdf"
     c = canvas.Canvas(filename, pagesize=letter)
     width, height = letter
 
@@ -24,9 +25,10 @@ def run_packager_agent(incident_data, agent_transcripts, images=[]):
 
     # Add images if available
     for img in images[:2]:  # Limit to 2 images
-        if os.path.exists(img['url']):
+        img_path = img['url'] if img['url'].startswith('/') else f"uploads/{img['url']}"
+        if os.path.exists(img_path):
             try:
-                c.drawImage(ImageReader(img['url']), 100, y - 200, width=200, height=150)
+                c.drawImage(ImageReader(img_path), 100, y - 200, width=200, height=150)
                 y -= 220
             except:
                 pass

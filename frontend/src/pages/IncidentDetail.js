@@ -6,18 +6,21 @@ import mapboxgl from 'mapbox-gl';
 const IncidentDetail = () => {
   const { id } = useParams();
   const [incident, setIncident] = useState(null);
+  const [allIncidents, setAllIncidents] = useState([]);
   const mapContainer = useRef(null);
   const map = useRef(null);
 
   useEffect(() => {
-    const fetchIncident = async () => {
+    const fetchData = async () => {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:8000/api/incidents/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setIncident(response.data);
+      const [incidentRes, allRes] = await Promise.all([
+        axios.get(`http://localhost:8000/api/incidents/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get('http://localhost:8000/api/incidents', { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+      setIncident(incidentRes.data);
+      setAllIncidents(allRes.data);
     };
-    fetchIncident();
+    fetchData();
   }, [id]);
 
   useEffect(() => {
@@ -66,9 +69,17 @@ const IncidentDetail = () => {
 
   if (!incident) return <div>Loading...</div>;
 
+  const currentIndex = allIncidents.findIndex(inc => inc.id === id);
+  const prevId = currentIndex > 0 ? allIncidents[currentIndex - 1].id : null;
+  const nextId = currentIndex < allIncidents.length - 1 ? allIncidents[currentIndex + 1].id : null;
+
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold">Incident {id}</h1>
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={() => prevId && window.location.href = `/incident/${prevId}`} disabled={!prevId} className="bg-gray-600 text-white px-4 py-2 rounded disabled:opacity-50">Previous</button>
+        <h1 className="text-2xl font-bold">Incident {id}</h1>
+        <button onClick={() => nextId && window.location.href = `/incident/${nextId}`} disabled={!nextId} className="bg-gray-600 text-white px-4 py-2 rounded disabled:opacity-50">Next</button>
+      </div>
       <p>Status: {incident.incident.status}</p>
       <p>Carbon Estimate: {incident.incident.carbon_estimate} kg CO2</p>
       <p>Confidence: {incident.incident.confidence_score}</p>
@@ -83,7 +94,7 @@ const IncidentDetail = () => {
           {incident.transcripts.map(trans => <p key={trans.id}><strong>{trans.agent_name}:</strong> {trans.transcript_text}</p>)}
         </div>
       </div>
-      <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Download Report</button>
+      <button onClick={() => window.open(`http://localhost:8000/api/incidents/${id}/download`)} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Download Report</button>
     </div>
   );
 };
