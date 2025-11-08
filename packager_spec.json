@@ -1,0 +1,60 @@
+{
+  "spec": {
+    "name": "Incident Packager Agent",
+    "description": "Generates PDF incident reports including images, polygons, carbon estimates, and agent transcripts",
+    "inputs": [
+      {
+        "name": "incident_data",
+        "type": "dict",
+        "description": "Incident details including id, carbon_estimate, status"
+      },
+      {
+        "name": "agent_transcripts",
+        "type": "list",
+        "description": "List of agent transcripts with agent_name and transcript_text"
+      },
+      {
+        "name": "images",
+        "type": "list",
+        "description": "List of image objects with url and metadata"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "pdf_filename",
+        "type": "string",
+        "description": "Path to the generated PDF file"
+      }
+    ],
+    "behavior": {
+      "steps": [
+        "Create PDF canvas with letter size",
+        "Add incident title and details",
+        "Add carbon estimate and status",
+        "List agent transcripts",
+        "Include up to 2 images if available",
+        "Save PDF to reports directory"
+      ]
+    },
+    "tests": [
+      {
+        "name": "Basic PDF generation",
+        "inputs": {
+          "incident_data": {"id": "test001", "carbon_estimate": 500, "status": "processed"},
+          "agent_transcripts": [{"agent_name": "Vision", "transcript_text": "Detected"}],
+          "images": [{"url": "sample.jpg"}]
+        },
+        "expected": "reports/incident_test001.pdf exists"
+      },
+      {
+        "name": "No images",
+        "inputs": {
+          "incident_data": {"id": "test002", "carbon_estimate": 300},
+          "agent_transcripts": [],
+          "images": []
+        },
+        "expected": "PDF generated without images"
+      }
+    ]
+  }
+}
