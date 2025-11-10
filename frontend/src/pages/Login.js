@@ -1,13 +1,28 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 const Login = () => {
+  const { publicKey, connected } = useWallet();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [builderId, setBuilderId] = useState('');
-  const [somniaWallet, setSomniaWallet] = useState('');
+  const [walletAddresses, setWalletAddresses] = useState({});
+
+  const connectWallet = async (chain) => {
+    if (chain === 'solana' && connected) {
+      setWalletAddresses({...walletAddresses, [chain]: publicKey.toString()});
+      alert(`Connected to Solana wallet: ${publicKey.toString()}`);
+    } else {
+      // Mock for other chains
+      const address = `${chain}_address_${Math.random().toString(36).substr(2, 9)}`;
+      setWalletAddresses({...walletAddresses, [chain]: address});
+      alert(`Connected to ${chain} wallet: ${address}`);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +32,7 @@ const Login = () => {
         localStorage.setItem('token', response.data.access_token);
         window.location.href = '/dashboard';
       } else {
-        await axios.post('http://localhost:8000/api/register', { name, email, password, builder_id: builderId, somnia_wallet_address: somniaWallet });
+        await axios.post('http://localhost:8000/api/register', { name, email, password, builder_id: builderId, wallet_addresses: walletAddresses });
         alert('Registration successful, please login');
         setIsLogin(true);
       }
@@ -39,7 +54,13 @@ const Login = () => {
             <>
               <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" className="w-full px-3 py-2 border rounded" required />
               <input type="text" value={builderId} onChange={(e) => setBuilderId(e.target.value)} placeholder="Builder ID" className="w-full px-3 py-2 border rounded" required />
-              <input type="text" value={somniaWallet} onChange={(e) => setSomniaWallet(e.target.value)} placeholder="Somnia Wallet Address" className="w-full px-3 py-2 border rounded" required />
+              <div className="space-y-2">
+                <p>Connect Wallets:</p>
+                <WalletMultiButton className="w-full" />
+                <button type="button" onClick={() => connectWallet('sui')} className="w-full bg-blue-600 text-white py-2 rounded">Connect Sui Wallet</button>
+                <button type="button" onClick={() => connectWallet('ton')} className="w-full bg-teal-600 text-white py-2 rounded">Connect TON Wallet</button>
+                <button type="button" onClick={() => connectWallet('somnia')} className="w-full bg-orange-600 text-white py-2 rounded">Connect Somnia Wallet</button>
+              </div>
             </>
           )}
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" className="w-full px-3 py-2 border rounded" required />

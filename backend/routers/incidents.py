@@ -93,3 +93,9 @@ async def get_stats(db: Session = Depends(get_db)):
 async def get_leaderboard(db: Session = Depends(get_db), limit: int = Query(10)):
     users = db.query(User).order_by(User.reward_points.desc()).limit(limit).all()
     return [{"name": user.name, "reward_points": user.reward_points, "role": user.role.value} for user in users]
+
+@router.post("/infer")
+async def infer_deforestation(image_url: str):
+    from ..ml.inference import detect_deforestation
+    polygons, confidence, rationale = detect_deforestation(image_url)
+    return {"polygons": polygons, "confidence": confidence, "rationale": rationale}

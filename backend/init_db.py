@@ -10,13 +10,12 @@ def init_database():
     try:
         # Sample users
         if not db.query(User).first():
-            admin = User(name="Admin User", email="admin@forestguard.com", hashed_password="$2b$12$examplehash", role=UserRole.admin, builder_id="admin123", somnia_wallet_address="0xadmin")
-            ranger = User(name="Ranger User", email="ranger@forestguard.com", hashed_password="$2b$12$examplehash", role=UserRole.ranger, builder_id="ranger123", somnia_wallet_address="0xranger")
-            ngo = User(name="NGO User", email="ngo@forestguard.com", hashed_password="$2b$12$examplehash", role=UserRole.ngo, builder_id="ngo123", somnia_wallet_address="0xngo")
+            admin = User(name="Admin User", email="admin@forestguard.com", hashed_password="$2b$12$examplehash", role=UserRole.admin, builder_id="admin123", wallet_addresses={"somnia": "0xadmin"})
+            ranger = User(name="Ranger User", email="ranger@forestguard.com", hashed_password="$2b$12$examplehash", role=UserRole.ranger, builder_id="ranger123", wallet_addresses={"somnia": "0xranger"})
+            ngo = User(name="NGO User", email="ngo@forestguard.com", hashed_password="$2b$12$examplehash", role=UserRole.ngo, builder_id="ngo123", wallet_addresses={"somnia": "0xngo"})
             db.add(admin)
             db.add(ranger)
             db.add(ngo)
-            db.add(user)
 
         # Sample incidents
         if not db.query(Incident).first():

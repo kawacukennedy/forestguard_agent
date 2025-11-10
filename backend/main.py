@@ -4,6 +4,10 @@ from .routers import upload, incidents, agents, notify, auth
 from fastapi import WebSocket
 from typing import List
 import json
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="ForestGuard Agent API", version="1.0.0")
 
@@ -28,11 +32,13 @@ websocket_connections: List[WebSocket] = []
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     websocket_connections.append(websocket)
+    logger.info("WebSocket connection established")
     try:
         while True:
             data = await websocket.receive_text()
             # Echo or handle messages
-    except:
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}")
         websocket_connections.remove(websocket)
 
 async def broadcast_incident_update(incident_data):
